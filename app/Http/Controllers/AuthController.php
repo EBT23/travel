@@ -14,10 +14,9 @@ class AuthController extends Controller
 
 		$client = new Client();
 
-		$response = $client->request('GET', 'https://travel.dlhcode.com/api/kota');
+		$response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
 		$data = json_decode($response->getBody(), true);
 
-		dd($data);
 
 		return view('Auth.login', $data);
 	}
