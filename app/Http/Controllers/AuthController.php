@@ -12,14 +12,23 @@ class AuthController extends Controller
 	{
 		$data['title'] = 'Login';
 
+		return view('Auth.login', $data);
+	}
+	public function aksi_login(Request $request)
+	{
 		$client = new Client();
 
-		$response = $client->request('GET', 'https://travel.dlhcode.com/api/kota');
-		$data = json_decode($response->getBody(), true);
+		$response = $client->request('POST', 'https://travel.dlhcode.com/api/login', [
+			'form_params' => [
+				'email' => $request->email,
+				'password' => $request->password,
+			]
+		]);
 
-		dd($data);
+		$body = $response->getBody();
+		$data = json_decode($body, true);
 
-		return view('Auth.login', $data);
+		return dd($data);
 	}
 
 	public function register()

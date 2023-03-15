@@ -40,18 +40,18 @@
 									</a>
 								</div>
 								<div class="p-2">
-									<form class="form-horizontal" action="https://themesbrand.com/skote-django/layouts/index.html">
+									<form class="form-horizontal" action="{{ route('aksi_login') }}">
 
 										<div class="mb-3">
-											<label for="username" class="form-label">Username</label>
-											<input type="text" class="form-control" id="username" placeholder="Enter username">
+											<label for="email" class="form-label">Email</label>
+											<input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
 										</div>
 
 										<div class="mb-3">
 											<label class="form-label">Password</label>
 											<div class="input-group auth-pass-inputgroup">
-												<input type="password" class="form-control" placeholder="Enter password" aria-label="Password"
-													aria-describedby="password-addon">
+												<input type="password" class="form-control" placeholder="Enter password" name="password"
+													aria-label="Password" aria-describedby="password-addon">
 												<button class="btn btn-light " type="button" id="password-addon"><i
 														class="mdi mdi-eye-outline"></i></button>
 											</div>

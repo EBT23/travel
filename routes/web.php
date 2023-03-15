@@ -15,8 +15,9 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::get('/', function () {
-				return view('Auth.login');
+	return view('Auth.login');
 });
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/aksi_login', [AuthController::class, 'aksi_login'])->name('aksi_login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
