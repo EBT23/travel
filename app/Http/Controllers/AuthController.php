@@ -28,7 +28,7 @@ class AuthController extends Controller
 		$body = $response->getBody();
 		$data = json_decode($body, true);
 
-		return dd($data);
+		return view('Admin.dashboard', $data);
 	}
 
 	public function register()
