@@ -25,4 +25,17 @@ class AdminController extends Controller
 
         return view('Admin.supir', $data);
     }
+    public function kota()
+    {
+        $data['title'] = 'Kelola Kota';
+
+        $client = new Client();
+
+        $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
+        $data = json_decode($response->getBody(), true);
+
+        return view('Admin.kota', $data);
+    }
+
+    
 }

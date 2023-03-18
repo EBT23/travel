@@ -23,5 +23,6 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/aksi_login', [AuthController::class, 'aksi_login'])->name('aksi_login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+Route::get('/kota', [AdminController::class, 'kota'])->name('kota');
 
 Route::get('/supir', [AdminController::class, 'supir'])->name('supir');
