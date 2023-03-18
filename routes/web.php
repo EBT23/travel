@@ -25,5 +25,6 @@ Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
 Route::get('/supir', [AdminController::class, 'supir'])->name('supir');
+Route::get('/kota', [AdminController::class, 'kota'])->name('kota');
 Route::get('/persediaan_tiket', [AdminController::class, 'persediaan_tiket'])->name('persediaan_tiket');
 Route::get('/tambah_persediaan_tiket', [AdminController::class, 'tambah_persediaan_tiket'])->name('tambah.persediaan');

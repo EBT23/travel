@@ -18,7 +18,7 @@ class AuthController extends Controller
 	{
 		$client = new Client();
 
-		$response = $client->request('POST', 'https://travel.dlhcode.com/api/login', [
+		$response = $client->request('POST', 'http://travel.dlhcode.com/api/login', [
 			'form_params' => [
 				'email' => $request->email,
 				'password' => $request->password,
