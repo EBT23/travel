@@ -28,7 +28,14 @@ class AuthController extends Controller
 		$body = $response->getBody();
 		$data = json_decode($body, true);
 
-		return view('Admin.dashboard', $data);
+		if (isset($data['data'])) {
+			// Jika access_token ditemukan, simpan ke session dan redirect ke halaman dashboard
+			session(['access_token' => $data['data']]);
+			return redirect()->route('dashboard');
+		} else {
+			// Jika access_token tidak ditemukan, redirect kembali ke halaman login
+			return redirect()->back();
+		}
 	}
 
 	public function register()

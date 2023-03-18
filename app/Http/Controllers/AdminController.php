@@ -7,7 +7,12 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    //
+    public function dashboard()
+    {
+        $data['title'] = 'Dashboard';
+
+        return view('Admin.dashboard', $data);
+    }
     public function supir()
     {
         $data['title'] = 'Kelola Supir';
