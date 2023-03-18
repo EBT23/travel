@@ -18,11 +18,11 @@ class AdminController extends Controller
     {
         $data['title'] = 'Kelola Supir';
         $token = session('access_token');
-        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/supir');
+        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/supir');
         $body = $response->getBody();
         $data['persediaan_tiket'] = json_decode($body, true);
 
-        $response = Http::get('http://travel.dlhcode.com/api/supir');
+        $response = Http::get('https://travel.dlhcode.com/api/supir');
         $body_supir = $response->getBody();
         $data['users'] = json_decode($body_supir, true);
         $data['users'] = $data['users']['data'];
@@ -34,7 +34,7 @@ class AdminController extends Controller
     {
         $data['title'] = 'Kelola Kota';
         $token = session('access_token');
-        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/kota');
+        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/kota');
         $body = $response->getBody();
         $data['kota'] = json_decode($body, true);
         $data['kota'] = $data['kota']['data'];
@@ -46,7 +46,7 @@ class AdminController extends Controller
     {
         $data['title'] = 'Persediaan Tiket';
         $token = session('access_token');
-        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/persediaan_tiket');
+        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/persediaan_tiket');
 
         $body = $response->getBody();
         $data['persediaan_tiket'] = json_decode($body, true);
