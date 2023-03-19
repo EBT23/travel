@@ -11,7 +11,7 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">FORM TAMBAH KOTA</h4>
+                            <h4 class="card-title">Pilih Tiket</h4>
                             <form>
                                 <div class="row">
                                     <div class="col-lg-6">

@@ -102,6 +102,11 @@
     <script src="{{ asset('assets/js/pages/datatables.init.js') }}"></script>
     {{-- end datatables --}}
 
+    {{-- chart --}}
+    <script src="{{ asset('assets/libs/echarts/echarts.min.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/echarts.init.js') }}"></script>
+    {{-- end chart --}}
+
 </body>
 
 <!-- Mirrored from themesbrand.com/skote-django/layouts/pages-starter.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 20 Feb 2023 01:54:17 GMT -->

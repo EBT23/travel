@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
 {
@@ -25,6 +26,8 @@ class AdminController extends Controller
 
         return view('Admin.supir', $data);
     }
+
+
     public function kota()
     {
         $data['title'] = 'Kelola Kota';
@@ -33,9 +36,35 @@ class AdminController extends Controller
 
         $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
         $data = json_decode($response->getBody(), true);
+        
+
+        $kota = $response->getBody();
+        $data['nama_kota'] = json_decode($kota, true);
+        $data['nama_kota'] = $data['nama_kota']['data'];
 
         return view('Admin.kota', $data);
     }
 
-    
+//agen
+   
+    public function persediaan_tiket()
+    {
+        $data['title'] = 'Persediaan Tiket';
+        $token = session('access_token');
+        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/persediaan_tiket');
+
+        $body = $response->getBody();
+        $data['persediaan_tiket'] = json_decode($body, true);
+
+        $response = Http::get('https://travel.dlhcode.com/api/tempat_agen');
+        $body_tempat_agen = $response->getBody();
+        $data['tempat_agen'] = json_decode($body_tempat_agen, true);
+        $data['tempat_agen'] = $data['tempat_agen']['data'];
+
+
+        return view('Admin.persediaan_tiket', $data);
+    }
+    public function tambah_persediaan_tiket()
+    {
+    }
 }
