@@ -9,10 +9,21 @@
 
 				<div class="row">
 					<div class="col-lg-12">
+						<div>
+							@if (Session::has('success'))
+								<div class="alert alert-success">
+									{{ Session::get('success') }}
+								</div>
+							@elseif (Session::has('errors'))
+								<div class="alert alert-danger">
+									{{ Session::get('errors') }}
+								</div>
+							@endif
+						</div>
 						<div class="card">
 							<div class="card-body">
 								<h4 class="card-title">{{ $title }}</h4>
-								<form method="POST" action="{{ route('tambah.persediaan') }}">
+								<form action="{{ route('tambah.persediaan.tiket') }}" method="POST" enctype="multipart/form-data">
 									@csrf
 									<div class="form-group mt-3">
 										<label for="tgl_keberangkatan">Tanggal Keberangkatan</label>
@@ -24,16 +35,16 @@
 										<select class="form-control" id="asal" name="asal" required>
 											<option value="">Pilih asal</option>
 											@foreach ($tempat_agen as $ta)
-												<option value="{{ $ta['tempat_agen'] }}">{{ $ta['tempat_agen'] }}</option>
+												<option value="{{ $ta['id'] }}">{{ $ta['tempat_agen'] }}</option>
 											@endforeach
 										</select>
 									</div>
 									<div class="form-group mt-3">
 										<label for="asal">tujuan</label>
-										<select class="form-control" id="asal" name="asal" required>
+										<select class="form-control" id="tujuan" name="tujuan" required>
 											<option value="">Pilih tujuan</option>
 											@foreach ($tempat_agen as $ta)
-												<option value="{{ $ta['tempat_agen'] }}">{{ $ta['tempat_agen'] }}</option>
+												<option value="{{ $ta['id'] }}">{{ $ta['tempat_agen'] }}</option>
 											@endforeach
 										</select>
 									</div>
