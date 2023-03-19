@@ -1,4 +1,4 @@
-@extends('layouts.base', ['title' => 'Dashboard - Administrator - Laravel 9'])
+@extends('layouts.base', ['title' => "$title - Admin"])
 
 @section('content')
 @include('layouts.header', ['title' => 'Dashboard', 'action' => 'Dashboard'])
