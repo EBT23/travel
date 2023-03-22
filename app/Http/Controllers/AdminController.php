@@ -19,67 +19,120 @@ class AdminController extends Controller
     public function supir()
     {
         $data['title'] = 'Kelola Supir';
-        $token = session('access_token');
-        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/supir');
-        $body = $response->getBody();
-        $data['persediaan_tiket'] = json_decode($body, true);
 
-        $response = Http::get('https://travel.dlhcode.com/api/supir');
+        $token = session('access_token');
+
+        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/supir');
         $body_supir = $response->getBody();
         $data['users'] = json_decode($body_supir, true);
         $data['users'] = $data['users']['data'];
-
+        dd($data);
         return view('Admin.supir', $data);
     }
-   ######## KOTA ########
+    ######## KOTA ########
     public function kota()
     {
         $data['title'] = 'Kelola Kota';
 
         $client = new Client();
 
-        $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
+        $response = $client->request('GET', 'https://travel.dlhcode.com/api/kota');
         $data = json_decode($response->getBody(), true);
-        
+
 
         $kota = $response->getBody();
         $data['nama_kota'] = json_decode($kota, true);
         $data['nama_kota'] = $data['nama_kota']['data'];
-return view('Admin.kota', $data);
-}
-######## AGEN ########
- public function agen()
- {
- $data['title'] = 'Kelola Agen';
- $client = new Client();
+        return view('Admin.kota', $data);
+    }
 
- $response = $client->request('GET', 'http://travel.dlhcode.com/api/tempat_agen');
- $data = json_decode($response->getBody(), true);
- $agen = $response->getBody();
- $data['tempat_agen'] = json_decode($agen, true);
- $data['tempat_agen'] = $data['tempat_agen']['data'];
- return view('Admin.agen', $data);
- }
+    public function tambah_kota(Request $request)
+    {
+        $token = session('access_token');
 
-######## SHUTTLE ########
- public function shuttle()
- {
- $data['title'] = 'Kelola Shuttle';
- $client = new Client();
+        $addKota = [
+            'nama_kota' => $request->nama_kota,
+        ];
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token, // token autentikasi
+            'Accept' => 'application/json', // format respon
+        ])->post('htts://travel.dlhcode.com/api/tambah_kota', $addKota);
 
- $response = $client->request('GET', 'http://travel.dlhcode.com/api/supir');
- $data = json_decode($response->getBody(), true);
- dd($data);
- $shuttle = $response->getBody();
- $data['shuttle'] = json_decode($shuttle, true);
- $data['shuttle'] = $data['shuttle']['data'];
- return view('Admin.shuttle', $data);
- }
+        if ($response->ok()) {
+            $response->json(); // data response jika request sukses
+            // lakukan sesuatu dengan data response
+            return redirect()
+                ->route('kota')
+                ->withSuccess('Kota berhasil ditambahkan');
+        } else {
+            $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
+            $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
+            // lakukan sesuatu dengan pesan error
+            return redirect()->route('kota')
+                ->with('error', 'Kota gagal disimpan');
+        }
+    }
+
+    public function update_kota(Request $request, $id)
+    {
+        $client = new Client();
+
+        // Data yang akan diperbarui
+        $data = [
+            'nama_kota' => $request->nama_kota,
+        ];
+
+        // Kirim permintaan PUT ke API
+        $response = $client->request('PUT', 'https://travel.dlhcode.com/api/update_kota' . $id, [
+            'json' => $data
+        ]);
+
+        // Decode respons JSON menjadi array asosiatif
+        $responseBody = json_decode($response->getBody(), true);
+
+        // Cek apakah data berhasil diperbarui
+        if ($response->getStatusCode() == 200 && isset($responseBody['id'])) {
+            // Jika berhasil, tampilkan pesan sukses dan ID data yang diperbarui
+            return 'Data dengan ID ' . $responseBody['id'] . ' berhasil diperbarui';
+        } else {
+            // Jika gagal, tampilkan pesan error
+            return 'Gagal memperbarui data';
+        }
+    }
+
+    ######## AGEN ########
+    public function agen()
+    {
+        $data['title'] = 'Kelola Agen';
+        $client = new Client();
+
+        $response = $client->request('GET', 'https://travel.dlhcode.com/api/tempat_agen');
+        $data = json_decode($response->getBody(), true);
+        $agen = $response->getBody();
+        $data['tempat_agen'] = json_decode($agen, true);
+        $data['tempat_agen'] = $data['tempat_agen']['data'];
+        return view('Admin.agen', $data);
+    }
+
+    ######## SHUTTLE ########
+    public function shuttle()
+    {
+        $data['title'] = 'Kelola Shuttle';
+        $client = new Client();
+
+        $response = $client->request('GET', 'https://travel.dlhcode.com/api/supir');
+        $data = json_decode($response->getBody(), true);
+        dd($data);
+        $shuttle = $response->getBody();
+        $data['shuttle'] = json_decode($shuttle, true);
+        $data['shuttle'] = $data['shuttle']['data'];
+        return view('Admin.shuttle', $data);
+    }
 
 
 
-######## PERSEDIAAN TIKET ########
-       public function persediaan_tiket()
+    ######## PERSEDIAAN TIKET ########
+    public function persediaan_tiket()
     {
         $data['title'] = 'Persediaan Tiket';
         $token = session('access_token');
