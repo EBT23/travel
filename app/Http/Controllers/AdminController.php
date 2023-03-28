@@ -22,7 +22,7 @@ class AdminController extends Controller
 
         $token = session('access_token');
 
-        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/supir');
+        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/supir');
         $body_supir = $response->getBody();
         $data['users'] = json_decode($body_supir, true);
         $data['users'] = $data['users']['data'];
@@ -36,7 +36,7 @@ class AdminController extends Controller
 
         $client = new Client();
 
-        $response = $client->request('GET', 'https://travel.dlhcode.com/api/kota');
+        $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
         $data = json_decode($response->getBody(), true);
 
 
@@ -56,7 +56,7 @@ class AdminController extends Controller
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token, // token autentikasi
             'Accept' => 'application/json', // format respon
-        ])->post('htts://travel.dlhcode.com/api/tambah_kota', $addKota);
+        ])->post('http://travel.dlhcode.com/api/tambah_kota', $addKota);
 
         if ($response->ok()) {
             $response->json(); // data response jika request sukses
@@ -83,7 +83,7 @@ class AdminController extends Controller
         ];
 
         // Kirim permintaan PUT ke API
-        $response = $client->request('PUT', 'https://travel.dlhcode.com/api/update_kota' . $id, [
+        $response = $client->request('PUT', 'http://travel.dlhcode.com/api/update_kota' . $id, [
             'json' => $data
         ]);
 

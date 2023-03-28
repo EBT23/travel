@@ -6,7 +6,7 @@
 <div class="main-content">
   
     <div class="page-content">
-        <div class="container-fluid">
+<div class="container-fluid">
             @if (Session::has('success'))
             <div class="alert alert-success">
                 {{ Session::get('success') }}
@@ -70,7 +70,10 @@
                                              <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
                                                 Edit
                                             </button>
-                                            <button type="button" class="btn btn-danger" > <i class="dripicons-trash"></i></button>
+                                             <button type="button" class="btn btn-danger btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
+                                                Hapus
+                                            </button>
+                                          
                                         </td>
                                     </tr>
                                     @endforeach
