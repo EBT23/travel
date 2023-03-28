@@ -19,16 +19,14 @@ class AdminController extends Controller
     public function supir()
     {
         $data['title'] = 'Kelola Supir';
-        $token = session('access_token');
-        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/supir');
-        $body = $response->getBody();
-        $data['persediaan_tiket'] = json_decode($body, true);
 
-        $response = Http::get('https://travel.dlhcode.com/api/supir');
+        $token = session('access_token');
+
+        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/supir');
         $body_supir = $response->getBody();
         $data['users'] = json_decode($body_supir, true);
         $data['users'] = $data['users']['data'];
-
+        dd($data);
         return view('Admin.supir', $data);
     }
     ######## KOTA ########
@@ -38,7 +36,7 @@ class AdminController extends Controller
 
         $client = new Client();
 
-        $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
+        $response = $client->request('GET', 'https://travel.dlhcode.com/api/kota');
         $data = json_decode($response->getBody(), true);
 
 
@@ -47,13 +45,68 @@ class AdminController extends Controller
         $data['nama_kota'] = $data['nama_kota']['data'];
         return view('Admin.kota', $data);
     }
+
+    public function tambah_kota(Request $request)
+    {
+        $token = session('access_token');
+
+        $addKota = [
+            'nama_kota' => $request->nama_kota,
+        ];
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token, // token autentikasi
+            'Accept' => 'application/json', // format respon
+        ])->post('htts://travel.dlhcode.com/api/tambah_kota', $addKota);
+
+        if ($response->ok()) {
+            $response->json(); // data response jika request sukses
+            // lakukan sesuatu dengan data response
+            return redirect()
+                ->route('kota')
+                ->withSuccess('Kota berhasil ditambahkan');
+        } else {
+            $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
+            $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
+            // lakukan sesuatu dengan pesan error
+            return redirect()->route('kota')
+                ->with('error', 'Kota gagal disimpan');
+        }
+    }
+
+    public function update_kota(Request $request, $id)
+    {
+        $client = new Client();
+
+        // Data yang akan diperbarui
+        $data = [
+            'nama_kota' => $request->nama_kota,
+        ];
+
+        // Kirim permintaan PUT ke API
+        $response = $client->request('PUT', 'https://travel.dlhcode.com/api/update_kota' . $id, [
+            'json' => $data
+        ]);
+
+        // Decode respons JSON menjadi array asosiatif
+        $responseBody = json_decode($response->getBody(), true);
+
+        // Cek apakah data berhasil diperbarui
+        if ($response->getStatusCode() == 200 && isset($responseBody['id'])) {
+            // Jika berhasil, tampilkan pesan sukses dan ID data yang diperbarui
+            return 'Data dengan ID ' . $responseBody['id'] . ' berhasil diperbarui';
+        } else {
+            // Jika gagal, tampilkan pesan error
+            return 'Gagal memperbarui data';
+        }
+    }
+
     ######## AGEN ########
     public function agen()
     {
         $data['title'] = 'Kelola Agen';
         $client = new Client();
 
-        $response = $client->request('GET', 'http://travel.dlhcode.com/api/tempat_agen');
+        $response = $client->request('GET', 'https://travel.dlhcode.com/api/tempat_agen');
         $data = json_decode($response->getBody(), true);
         $agen = $response->getBody();
         $data['tempat_agen'] = json_decode($agen, true);
@@ -83,6 +136,8 @@ class AdminController extends Controller
         $data['shuttle'] = $data['shuttle']['data'];
         return view('Admin.shuttle', $data);
     }
+
+
 
     ######## PERSEDIAAN TIKET ########
     public function persediaan_tiket()
