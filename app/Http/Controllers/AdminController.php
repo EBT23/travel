@@ -31,7 +31,7 @@ class AdminController extends Controller
 
         return view('Admin.supir', $data);
     }
-   ######## KOTA ########
+    ######## KOTA ########
     public function kota()
     {
         $data['title'] = 'Kelola Kota';
@@ -40,46 +40,52 @@ class AdminController extends Controller
 
         $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
         $data = json_decode($response->getBody(), true);
-        
+
 
         $kota = $response->getBody();
         $data['nama_kota'] = json_decode($kota, true);
         $data['nama_kota'] = $data['nama_kota']['data'];
-return view('Admin.kota', $data);
-}
-######## AGEN ########
- public function agen()
- {
- $data['title'] = 'Kelola Agen';
- $client = new Client();
+        return view('Admin.kota', $data);
+    }
+    ######## AGEN ########
+    public function agen()
+    {
+        $data['title'] = 'Kelola Agen';
+        $client = new Client();
 
- $response = $client->request('GET', 'http://travel.dlhcode.com/api/tempat_agen');
- $data = json_decode($response->getBody(), true);
- $agen = $response->getBody();
- $data['tempat_agen'] = json_decode($agen, true);
- $data['tempat_agen'] = $data['tempat_agen']['data'];
- return view('Admin.agen', $data);
- }
+        $response = $client->request('GET', 'http://travel.dlhcode.com/api/tempat_agen');
+        $data = json_decode($response->getBody(), true);
+        $agen = $response->getBody();
+        $data['tempat_agen'] = json_decode($agen, true);
+        $data['tempat_agen'] = $data['tempat_agen']['data'];
+        return view('Admin.agen', $data);
+    }
 
-######## SHUTTLE ########
- public function shuttle()
- {
- $data['title'] = 'Kelola Shuttle';
- $client = new Client();
+    ######## SHUTTLE ########
+    public function shuttle()
+    {
+        $data['title'] = 'Kelola Shuttle';
+        $token = session('access_token');
+        $client = new Client([
+            'base_uri' => 'https://travel.dlhcode.com/api/',
+            'timeout' => 2.0,
+        ]);
 
- $response = $client->request('GET', 'http://travel.dlhcode.com/api/supir');
- $data = json_decode($response->getBody(), true);
- dd($data);
- $shuttle = $response->getBody();
- $data['shuttle'] = json_decode($shuttle, true);
- $data['shuttle'] = $data['shuttle']['data'];
- return view('Admin.shuttle', $data);
- }
+        $response = $client->request('GET', "shuttle", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+            ]
+        ]);
+        $data = json_decode($response->getBody(), true);
+        $shuttle = $response->getBody();
+        $data['shuttle'] = json_decode($shuttle, true);
+        $data['shuttle'] = $data['shuttle']['data'];
+        return view('Admin.shuttle', $data);
+    }
 
-
-
-######## PERSEDIAAN TIKET ########
-       public function persediaan_tiket()
+    ######## PERSEDIAAN TIKET ########
+    public function persediaan_tiket()
     {
         $data['title'] = 'Persediaan Tiket';
         $token = session('access_token');
@@ -87,6 +93,7 @@ return view('Admin.kota', $data);
 
         $body = $response->getBody();
         $data['persediaan_tiket'] = json_decode($body, true);
+        $data['persediaan_tiket'] = $data['persediaan_tiket']['data'];
         $response = Http::get('https://travel.dlhcode.com/api/tempat_agen');
         $body_tempat_agen = $response->getBody();
         $data['tempat_agen'] = json_decode($body_tempat_agen, true);
@@ -124,5 +131,78 @@ return view('Admin.kota', $data);
             return redirect()->route('persediaan_tiket')
                 ->with('error', 'Persediaan tiket gagal disimpan');
         }
+    }
+    public function update_persediaan_tiket(Request $request, $id)
+    {
+        $token = session('access_token');
+
+        $client = new Client([
+            'base_uri' => 'https://travel.dlhcode.com/api/',
+            'timeout' => 50.0,
+        ]);
+
+        $response = $client->request('PUT', "update_persediaan_tiket/$id", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/x-www-form-urlencoded',
+            ],
+            'json' => [
+                'tgl_keberangkatan' => $request->tgl_keberangkatan,
+                'asal' => $request->asal,
+                'tujuan' => $request->tujuan,
+                'kuota' => $request->kuota,
+                'estimasi_perjalanan' => $request->estimasi_perjalanan,
+                'harga' => $request->harga,
+            ],
+        ]);
+
+        $data = json_decode($response->getBody(), true);
+        return redirect()
+            ->route('persediaan_tiket')
+            ->withSuccess('Persediaan tiket berhasil diubah');
+    }
+    public function form_edit_persediaan($id)
+    {
+        $data['title'] = 'Edit Persediaan Tiket';
+        $token = session('access_token');
+        $client = new Client([
+            'base_uri' => 'https://travel.dlhcode.com/api/',
+            'timeout' => 2.0,
+        ]);
+
+        $response = $client->request('GET', "get_persediaan/$id", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+            ]
+        ]);
+
+        $data['persediaan'] = json_decode($response->getBody(), true);
+        $data['persediaan'] = $data['persediaan']['data'][0];
+        $response = Http::get('https://travel.dlhcode.com/api/tempat_agen');
+        $body_tempat_agen = $response->getBody();
+        $data['tempat_agen'] = json_decode($body_tempat_agen, true);
+        $data['tempat_agen'] = $data['tempat_agen']['data'];
+
+        return view('Admin.form_persediaan', $data);
+    }
+    public function delete_persediaan_tiket($id)
+    {
+        $token = session('access_token');
+        $client = new Client([
+            'base_uri' => 'https://travel.dlhcode.com/api/',
+            'timeout' => 2.0,
+        ]);
+
+        $response = $client->request('DELETE', "delete_persediaan_tiket/$id", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+            ]
+        ]);
+
+        return redirect()
+            ->route('persediaan_tiket')
+            ->withSuccess('Persediaan tiket berhasil dihapus');
     }
 }

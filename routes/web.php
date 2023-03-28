@@ -24,9 +24,13 @@ Route::get('/aksi_login', [AuthController::class, 'aksi_login'])->name('aksi_log
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 Route::get('/agen', [AdminController::class, 'agen'])->name('agen.index');
+
 Route::get('/shuttle', [AdminController::class, 'shuttle'])->name('shuttle.index');
 
 Route::get('/supir', [AdminController::class, 'supir'])->name('supir');
 Route::get('/kota', [AdminController::class, 'kota'])->name('kota');
 Route::get('/persediaan_tiket', [AdminController::class, 'persediaan_tiket'])->name('persediaan_tiket');
 Route::post('/tambah_persediaan_tiket', [AdminController::class, 'tambah_persediaan_tiket'])->name('tambah.persediaan.tiket');
+Route::post('/update_persediaan_tiket/{id}', [AdminController::class, 'update_persediaan_tiket'])->name('update.persediaan.tiket');
+Route::get('/form_edit_persediaan/{id}', [AdminController::class, 'form_edit_persediaan'])->name('form.edit.persediaan');
+Route::delete('/delete_persediaan_tiket/{id}', [AdminController::class, 'delete_persediaan_tiket'])->name('delete.persediaan.tiket');

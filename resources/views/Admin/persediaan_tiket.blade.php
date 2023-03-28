@@ -64,7 +64,64 @@
 									<button type="submit" class="btn btn-primary mt-3">Submit</button>
 								</form>
 							</div>
+
+							<div class="row">
+								<div class="col-12">
+									<div class="card">
+										<div class="card-body">
+
+											<h4 class="card-title my-2">Data Persediaan</h4>
+											<table id="datatable" class="table table-bordered dt-responsive  nowrap w-100 text-center">
+												<thead>
+													<tr>
+														<th width="5%">No</th>
+														<th>Tanggal Keberangkatan</th>
+														<th>Jam Keberangkatan</th>
+														<th>Asal</th>
+														<th>Tujuan</th>
+														<th>Kuota</th>
+														<th>estimasi_perjalanan</th>
+														<th>Harga</th>
+														<th width="15%">Aksi</th>
+
+													</tr>
+												</thead>
+
+
+												<tbody>
+													<?php $no = 1; ?>
+													@foreach ($persediaan_tiket as $pt)
+														<tr>
+															<td>{{ $no++ }}</td>
+															<td>{{ date('d-m-Y', strtotime($pt['tgl_keberangkatan'])) }}</td>
+															<td>{{ date('H:i', strtotime($pt['tgl_keberangkatan'])) . ' WIB' }}</td>
+															<td>{{ $pt['asal'] }}</td>
+															<td>{{ $pt['tujuan'] }}</td>
+															<td>{{ $pt['kuota'] }}</td>
+															<td>{{ $pt['estimasi_perjalanan'] . ' Jam' }}</td>
+															<td>{{ $pt['harga'] }}</td>
+															<td>
+																<a href="{{ route('form.edit.persediaan', ['id' => $pt['id']]) }}" type="button"
+																	class="btn btn-primary">
+																	<i class="dripicons-document-edit"></i></a>
+																<form action="{{ route('delete.persediaan.tiket', ['id' => $pt['id']]) }}" method="POST">
+																	{{ csrf_field() }}
+																	{{ method_field('DELETE') }}
+																	<button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"
+																		class="btn btn-danger"> <i class="dripicons-trash"></i></button>
+																</form>
+															</td>
+														</tr>
+													@endforeach
+												</tbody>
+											</table>
+
+										</div>
+									</div>
+								</div> <!-- end col -->
+							</div>
 						</div>
+
 					</div>
 
 
