@@ -1,4 +1,4 @@
-<div class="right-bar">
+{{-- <div class="right-bar">
     <div data-simplebar class="h-100">
         <div class="rightbar-title d-flex align-items-center px-3 py-4">
     
@@ -51,4 +51,4 @@
         </div>
 
     </div> <!-- end slimscroll-menu-->
-</div>
+</div> --}}
