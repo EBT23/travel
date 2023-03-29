@@ -4,9 +4,9 @@
 @include('layouts.header', ['title' => 'Dashboard', 'action' => 'Dashboard'])
 
 <div class="main-content">
-  
     <div class="page-content">
-<div class="container-fluid">
+
+    <div class="container-fluid">
             @if (Session::has('success'))
             <div class="alert alert-success">
                 {{ Session::get('success') }}
@@ -42,7 +42,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="row">
                 <div class="col-12">
                     <div class="card">
@@ -55,11 +54,8 @@
                                         <th width="5%">No</th>
                                         <th>Nama Kota</th>
                                         <th width="15%">Aksi</th>
-
                                     </tr>
                                 </thead>
-
-
                                 <tbody>
                                     @foreach ($nama_kota as $index => $nk)
                                     <tr>
@@ -67,13 +63,21 @@
                                         <td>{{ $nk['nama_kota'] }}</td>
                                         <td>
                                              <!-- Button trigger modal -->
-                                             <button type="button" class="btn btn-primary btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
-                                                Edit
-                                            </button>
-                                             <button type="button" class="btn btn-danger btn-sm btn-rounded waves-effect waves-light" data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
-                                                Hapus
-                                            </button>
-                                          
+                                             <span>
+
+                                                 <a href="{{ route('form.edit.kota', ['id' => $nk['id']]) }}" type="button"
+                                                    class="btn btn-primary">
+                                                    <i class="dripicons-document-edit"></i></a>
+                                                </span>
+                                                <span>
+
+                                                    <form action="{{ route('delete.kota', ['id' => $nk['id']]) }}" method="POST">
+                                                        {{ csrf_field() }}
+                                                        {{ method_field('DELETE') }}
+                                                        <button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"
+                                                        class="btn btn-danger"> <i class="dripicons-trash"></i></button>
+                                                    </form>
+                                                </span>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -89,36 +93,31 @@
     </div>
     <!-- End Page-content -->
 
-    <!-- Modal -->
-    <div class="modal fade transaction-detailModal" tabindex="-1" role="dialog" aria-labelledby="transaction-detailModalLabel" aria-hidden="true">
+    <!-- Static Backdrop Modal -->
+    {{-- <div class="modal fade" id="staticBackdrop" data-id="{{ $nk['id'] }} " data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="transaction-detailModalLabel">Data Kota</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">Edit Kota</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('update.kota', ['id' => $nk['id']]) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="form-group">
-                            <label for="kode_poli">Nama Kota</label>
-                            <input type="text" class="form-control" id="nama_kota" value="{{ $nk['nama_kota'] }}" name="nama_kota"
-                                aria-describedby="Nama Kota" required>
+                    <form action="{{ route('update.kota', ['id' => $nk['id']]) }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf>
+                        <div class="mb-3">
+                            <label for="nama_kota" class="form-label">Nama Kota</label>
+                            <input type="text" class="form-control" id="nama_kota" value="{{ $nk['nama_kota'] }}">
                         </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-dark">Simpan</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                            <button type="Submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- end modal -->
-
-
+    </div> --}}
 </div>
-
 
 @endsection

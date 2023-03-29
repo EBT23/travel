@@ -41,6 +41,7 @@
                                 <thead>
                                     <tr>
                                         <th width="5%">No</th>
+                                        <th>Nama Kota</th>
                                         <th>Lokasi Agen</th>
                                         <th width="15%">Aksi</th>
 
@@ -52,7 +53,7 @@
                                     @foreach ($tempat_agen as $index => $ta)
                                     <tr>
                                         <td>{{ $index+1 }}</td>
-                                        <td>{{ $ta['kota_id'] }}</td>
+                                        <td>{{ $ta['nama_kota'] }}</td>
                                         <td>{{ $ta['tempat_agen'] }}</td>
                                         <td>
                                             <button type="button" class="btn btn-primary"> <i class="dripicons-document-edit"></i></button>

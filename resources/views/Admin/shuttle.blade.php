@@ -3,10 +3,8 @@
 @section('content')
 	@include('layouts.header', ['title' => 'Dashboard', 'action' => 'Dashboard'])
 	<div class="main-content">
-
 		<div class="page-content">
 			<div class="container-fluid">
-
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="card">
@@ -16,13 +14,13 @@
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="mb-3  mt-3 mt-lg-0">
-												<label class="form-label" for="nama_kota">Masukkan Data</label>
-												<input class="form-control" name="nama_kota" id="nama_kota">
+												<label class="form-label" for="jenis_mobil">Masukkan Data</label>
+												<input class="form-control" name="jenis_mobil" id="jenis_mobil">
 											</div>
 										</div>
 									</div>
 									<div>
-										<button type="submit" class="btn btn-success w-md">Tambah Agen</i></button>
+										<button type="submit" class="btn btn-success w-md">Tambah Shuttle</i></button>
 									</div>
 								</form>
 
@@ -30,24 +28,20 @@
 						</div>
 					</div>
 				</div>
-
 				<div class="row">
 					<div class="col-12">
 						<div class="card">
 							<div class="card-body">
-
-								<h4 class="card-title my-2">Data Agen</h4>
+								<h4 class="card-title my-2">Data Shuttle</h4>
 								<table id="datatable" class="table table-bordered dt-responsive  nowrap w-100 text-center">
 									<thead>
 										<tr>
 											<th width="5%">No</th>
-											<th>Lokasi Agen</th>
+											<th>Jenis Shuttle</th>
+											<th>Nama Fasilitas</th>
 											<th width="15%">Aksi</th>
-
 										</tr>
 									</thead>
-
-
 									<tbody>
 										@foreach ($shuttle as $index => $s)
 											<tr>
@@ -62,7 +56,6 @@
 										@endforeach
 									</tbody>
 								</table>
-
 							</div>
 						</div>
 					</div> <!-- end col -->
@@ -71,7 +64,5 @@
 			<!-- container-fluid -->
 		</div>
 		<!-- End Page-content -->
-
-
 	</div>
 @endsection

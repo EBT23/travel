@@ -75,29 +75,69 @@ class AdminController extends Controller
 
     public function update_kota(Request $request, $id)
     {
-        $client = new Client();
-
-        // Data yang akan diperbarui
-        $data = [
-            'nama_kota' => $request->nama_kota,
-        ];
-
-        // Kirim permintaan PUT ke API
-        $response = $client->request('PUT', 'http://travel.dlhcode.com/api/update_kota' . $id, [
-            'json' => $data
+        $token = session('access_token');
+        $client = new Client([
+            'base_uri' => 'http://travel.dlhcode.com/api/',
+            'timeout' => 50.0,
         ]);
 
-        // Decode respons JSON menjadi array asosiatif
-        $responseBody = json_decode($response->getBody(), true);
+        $response = $client->request('PUT', "update_kota/$id", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/x-www-form-urlencoded',
+            ],
+            'json' => [
+                'nama_kota' => $request->nama_kota,
+            ],
+        ]);
 
-        // Cek apakah data berhasil diperbarui
-        if ($response->getStatusCode() == 200 && isset($responseBody['id'])) {
-            // Jika berhasil, tampilkan pesan sukses dan ID data yang diperbarui
-            return 'Data dengan ID ' . $responseBody['id'] . ' berhasil diperbarui';
-        } else {
-            // Jika gagal, tampilkan pesan error
-            return 'Gagal memperbarui data';
-        }
+        $data = json_decode($response->getBody(), true);
+        return redirect()
+            ->route('kota')
+            ->withSuccess('Kota berhasil diubah');
+    }
+
+    public function form_edit_kota($id)
+    {
+    $data['title'] = 'Edit Kota';
+    $token = session('access_token');
+    $client = new Client([
+    'base_uri' => 'http://travel.dlhcode.com/api/',
+    'timeout' => 2.0,
+    ]);
+    
+    $response = $client->request('GET', "get_kota/$id", [
+    'headers' => [
+    'Authorization' => 'Bearer ' . $token,
+    'Accept' => 'application/json',
+    ]
+    ]);
+    
+    
+    $data['kota'] = json_decode($response->getBody(), true);
+    $data['kota'] = $data['kota']['data'][0];
+   
+    return view('Admin.editKota', $data);
+    }
+
+    public function hapus_kota($id)
+    {
+        $token = session('access_token');
+    $client = new Client([
+    'base_uri' => 'http://travel.dlhcode.com/api/',
+    'timeout' => 2.0,
+    ]);
+
+    $response = $client->request('DELETE', "delete_kota/$id", [
+    'headers' => [
+    'Authorization' => 'Bearer ' . $token,
+    'Accept' => 'application/json',
+    ]
+    ]);
+
+    return redirect()
+            ->route('kota')
+            ->withSuccess('Kota berhasil dihapus');
     }
 
     ######## AGEN ########
@@ -106,7 +146,7 @@ class AdminController extends Controller
         $data['title'] = 'Kelola Agen';
         $client = new Client();
 
-        $response = $client->request('GET', 'https://travel.dlhcode.com/api/tempat_agen');
+        $response = $client->request('GET', 'http://travel.dlhcode.com/api/tempat_agen');
         $data = json_decode($response->getBody(), true);
         $agen = $response->getBody();
         $data['tempat_agen'] = json_decode($agen, true);
@@ -120,7 +160,7 @@ class AdminController extends Controller
         $data['title'] = 'Kelola Shuttle';
         $token = session('access_token');
         $client = new Client([
-            'base_uri' => 'https://travel.dlhcode.com/api/',
+            'base_uri' => 'http://travel.dlhcode.com/api/',
             'timeout' => 2.0,
         ]);
 
@@ -144,12 +184,12 @@ class AdminController extends Controller
     {
         $data['title'] = 'Persediaan Tiket';
         $token = session('access_token');
-        $response = Http::withToken("$token")->get('https://travel.dlhcode.com/api/persediaan_tiket');
+        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/persediaan_tiket');
 
         $body = $response->getBody();
         $data['persediaan_tiket'] = json_decode($body, true);
         $data['persediaan_tiket'] = $data['persediaan_tiket']['data'];
-        $response = Http::get('https://travel.dlhcode.com/api/tempat_agen');
+        $response = Http::get('http://travel.dlhcode.com/api/tempat_agen');
         $body_tempat_agen = $response->getBody();
         $data['tempat_agen'] = json_decode($body_tempat_agen, true);
         $data['tempat_agen'] = $data['tempat_agen']['data'];
@@ -171,7 +211,7 @@ class AdminController extends Controller
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token, // token autentikasi
             'Accept' => 'application/json', // format respon
-        ])->post('https://travel.dlhcode.com/api/tambah_persediaan_tiket', $data);
+        ])->post('http://travel.dlhcode.com/api/tambah_persediaan_tiket', $data);
 
         if ($response->ok()) {
             $responseData = $response->json(); // data response jika request sukses
@@ -192,7 +232,7 @@ class AdminController extends Controller
         $token = session('access_token');
 
         $client = new Client([
-            'base_uri' => 'https://travel.dlhcode.com/api/',
+            'base_uri' => 'http://travel.dlhcode.com/api/',
             'timeout' => 50.0,
         ]);
 
@@ -221,7 +261,7 @@ class AdminController extends Controller
         $data['title'] = 'Edit Persediaan Tiket';
         $token = session('access_token');
         $client = new Client([
-            'base_uri' => 'https://travel.dlhcode.com/api/',
+            'base_uri' => 'http://travel.dlhcode.com/api/',
             'timeout' => 2.0,
         ]);
 
@@ -234,7 +274,7 @@ class AdminController extends Controller
 
         $data['persediaan'] = json_decode($response->getBody(), true);
         $data['persediaan'] = $data['persediaan']['data'][0];
-        $response = Http::get('https://travel.dlhcode.com/api/tempat_agen');
+        $response = Http::get('http://travel.dlhcode.com/api/tempat_agen');
         $body_tempat_agen = $response->getBody();
         $data['tempat_agen'] = json_decode($body_tempat_agen, true);
         $data['tempat_agen'] = $data['tempat_agen']['data'];
@@ -245,7 +285,7 @@ class AdminController extends Controller
     {
         $token = session('access_token');
         $client = new Client([
-            'base_uri' => 'https://travel.dlhcode.com/api/',
+            'base_uri' => 'http://travel.dlhcode.com/api/',
             'timeout' => 2.0,
         ]);
 

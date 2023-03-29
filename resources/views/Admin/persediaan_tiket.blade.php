@@ -3,10 +3,8 @@
 @section('content')
 	@include('layouts.header', ['title' => 'Dashboard', 'action' => 'Dashboard'])
 	<div class="main-content">
-
 		<div class="page-content">
 			<div class="container-fluid">
-
 				<div class="row">
 					<div class="col-lg-12">
 						<div>
@@ -64,12 +62,10 @@
 									<button type="submit" class="btn btn-primary mt-3">Submit</button>
 								</form>
 							</div>
-
 							<div class="row">
 								<div class="col-12">
 									<div class="card">
 										<div class="card-body">
-
 											<h4 class="card-title my-2">Data Persediaan</h4>
 											<table id="datatable" class="table table-bordered dt-responsive  nowrap w-100 text-center">
 												<thead>
@@ -83,11 +79,8 @@
 														<th>estimasi_perjalanan</th>
 														<th>Harga</th>
 														<th width="15%">Aksi</th>
-
 													</tr>
 												</thead>
-
-
 												<tbody>
 													<?php $no = 1; ?>
 													@foreach ($persediaan_tiket as $pt)
