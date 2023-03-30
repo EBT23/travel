@@ -23,13 +23,18 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/aksi_login', [AuthController::class, 'aksi_login'])->name('aksi_login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
 Route::get('/agen', [AdminController::class, 'agen'])->name('agen.index');
+Route::post('/tambah_agen', [AdminController::class, 'tambah_agen'])->name('tambah.agen');
+Route::post('/update_agen/{id}', [AdminController::class, 'update_agen'])->name('update.agen');
+Route::get('/edit_agen/{id}', [AdminController::class, 'edit_agen'])->name('edit.agen');
+Route::delete('/delete_tempat_agen/{id}', [AdminController::class, 'hapus_tempat_agen'])->name('delete.tempat.agen');
 
 Route::get('/shuttle', [AdminController::class, 'shuttle'])->name('shuttle.index');
-// Route::post('/tambah_shuttle', [AdminController::class, 'tambah_shuttle'])->name('tambah.shuttle');
-// Route::post('/update_shuttle/{id}', [AdminController::class, 'update_shuttle'])->name('update.shuttle');
-// Route::get('/form_edit_shuttle/{id}', [AdminController::class, 'form_edit_shuttle'])->name('form.edit.shuttle');
-// Route::delete('/delete_shuttle/{id}', [AdminController::class, 'hapus_shuttle'])->name('delete.shuttle');
+Route::post('/tambah_shuttle', [AdminController::class, 'tambah_shuttle'])->name('tambah.shuttle');
+Route::post('/update_shuttle/{id}', [AdminController::class, 'update_shuttle'])->name('update.shuttle');
+Route::get('/edit_shuttle/{id}', [AdminController::class, 'edit_shuttle'])->name('edit.shuttle');
+Route::delete('/delete_shuttle/{id}', [AdminController::class, 'hapus_shuttle'])->name('delete.shuttle');
 
 Route::get('/supir', [AdminController::class, 'supir'])->name('supir');
 Route::get('/kota', [AdminController::class, 'kota'])->name('kota');

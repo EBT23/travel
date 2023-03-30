@@ -5,12 +5,23 @@
 	<div class="main-content">
 		<div class="page-content">
 			<div class="container-fluid">
+				@if (Session::has('success'))
+				<div class="alert alert-success">
+					{{ Session::get('success') }}
+				</div>
+				@elseif (Session::has('errors'))
+				<div class="alert alert-danger">
+					{{ Session::get('errors') }}
+				</div>
+				@endif
+			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="card">
 							<div class="card-body">
 								<h4 class="card-title">FORM TAMBAH DATA SHUTTLE</h4>
-								<form>
+								<formaction="{{ route('tambah.shuttle') }}" method="POST" enctype="multipart/form-data">
+									@csrf
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="mb-3  mt-3 mt-lg-0">
@@ -49,8 +60,18 @@
 												<td>{{ $s['jenis_mobil'] }}</td>
 												<td>{{ $s['nama_fasilitas'] }}</td>
 												<td>
-													<button type="button" class="btn btn-primary"> <i class="dripicons-document-edit"></i></button>
-													<button type="button" class="btn btn-danger"> <i class="dripicons-trash"></i></button>
+													<div class="d-flex flex-wrap gap-4">
+														<a href="{{ route('edit.shuttle', ['id' => $s['id']]) }}" type="button"
+															class="btn btn-soft-primary waves-effect waves-light">
+														   <i class="dripicons-document-edit"></i></a>
+		
+														   <form action="{{ route('delete.shuttle', ['id' => $s['id']]) }}" method="POST">
+															{{ csrf_field() }}
+															{{ method_field('DELETE') }}
+															<button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"
+															class="btn btn-soft-danger waves-effect waves-light"> <i class="dripicons-trash"></i></button>
+														</form>
+													</div>
 												</td>
 											</tr>
 										@endforeach

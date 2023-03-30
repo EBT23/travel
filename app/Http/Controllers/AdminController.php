@@ -146,14 +146,117 @@ class AdminController extends Controller
         $data['title'] = 'Kelola Agen';
         $client = new Client();
 
+
+        $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
+        $get_kota = json_decode($response->getBody(), true);
+        $agen = $response->getBody();
+        $get_kota['kota'] = json_decode($agen, true);
+        $get_kota['kota'] = $get_kota['kota']['data'];
+
         $response = $client->request('GET', 'http://travel.dlhcode.com/api/tempat_agen');
         $data = json_decode($response->getBody(), true);
         $agen = $response->getBody();
         $data['tempat_agen'] = json_decode($agen, true);
         $data['tempat_agen'] = $data['tempat_agen']['data'];
-        return view('Admin.agen', $data);
+        return view('Admin.agen', $data, $get_kota);
     }
 
+    public function tambah_agen(Request $request)
+    {
+        $token = session('access_token');
+
+        $addAgen = [
+            'kota_id' => $request->kota_id,
+            'tempat_agen' => $request->tempat_agen,
+        ];
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token, // token autentikasi
+            'Accept' => 'application/json', // format respon
+        ])->post('http://travel.dlhcode.com/api/tambah_agen', $addAgen);
+
+        if ($response->ok()) {
+            $response->json(); // data response jika request sukses
+            // lakukan sesuatu dengan data response
+            return redirect()
+                ->route('agen.index')
+                ->withSuccess('Tempat agen berhasil ditambahkan');
+        } else {
+            $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
+            $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
+            // lakukan sesuatu dengan pesan error
+            return redirect()->route('agen.index')
+                ->with('error', 'Tempat agen gagal disimpan');
+        }
+    }
+
+    public function update_agen(Request $request, $id)
+    {
+        $token = session('access_token');
+        $client = new Client([
+            'base_uri' => 'http://travel.dlhcode.com/api/',
+            'timeout' => 50.0,
+        ]);
+
+        $response = $client->request('PUT', "update_tempat_agen/$id", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/x-www-form-urlencoded',
+            ],
+            'json' => [
+                'kota_id' => $request->kota_id,
+                'tempat_agen' => $request->tempat_agen,
+            ],
+        ]);
+
+        $data = json_decode($response->getBody(), true);
+        return redirect()
+            ->route('agen')
+            ->withSuccess('Tempat agen berhasil diubah');
+    }
+
+    public function edit_agen($id)
+    {
+        $data['title'] = 'Edit Agen';
+        $token = session('access_token');
+        $client = new Client([
+        'base_uri' => 'http://travel.dlhcode.com/api/',
+        'timeout' => 2.0,
+        ]);
+    
+        $response = $client->request('GET', "get_tempat_agen/$id", [
+        'headers' => [
+        'Authorization' => 'Bearer ' . $token,
+        'Accept' => 'application/json',
+        ]
+        ]);
+    
+    
+        $data['tempat_agen'] = json_decode($response->getBody(), true);
+        $data['tempat_agen'] = $data['tempat_agen']['data'][0];
+   
+        return view('Admin.edit_agen', $data);
+    }
+
+    public function hapus_tempat_agen($id)
+    {
+        $token = session('access_token');
+    $client = new Client([
+    'base_uri' => 'http://travel.dlhcode.com/api/',
+    'timeout' => 2.0,
+    ]);
+
+    $response = $client->request('DELETE', "delete_tempat_agen/$id", [
+    'headers' => [
+    'Authorization' => 'Bearer ' . $token,
+    'Accept' => 'application/json',
+    ]
+    ]);
+
+    return redirect()
+            ->route('agen.index')
+            ->withSuccess('Tempat agen berhasil dihapus');
+    }
+   
     ######## SHUTTLE ########
     public function shuttle()
     {
@@ -177,6 +280,101 @@ class AdminController extends Controller
         return view('Admin.shuttle', $data);
     }
 
+    public function tambah_shuttle(Request $request)
+    {
+        $token = session('access_token');
+
+        $addShuttle = [
+            'id_jenis_mobil' => $request->id_jenis_mobil,
+            'id_fasilitas' => $request->id_fasilitas,
+        ];
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token, // token autentikasi
+            'Accept' => 'application/json', // format respon
+        ])->post('http://travel.dlhcode.com/api/tambah_shuttle', $addShuttle);
+
+        if ($response->ok()) {
+            $response->json(); // data response jika request sukses
+            // lakukan sesuatu dengan data response
+            return redirect()
+                ->route('kota')
+                ->withSuccess('Kota berhasil ditambahkan');
+        } else {
+            $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
+            $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
+            // lakukan sesuatu dengan pesan error
+            return redirect()->route('kota')
+                ->with('error', 'Kota gagal disimpan');
+        }
+    }
+
+    public function update_shuttle(Request $request, $id)
+    {
+        $token = session('access_token');
+        $client = new Client([
+            'base_uri' => 'http://travel.dlhcode.com/api/',
+            'timeout' => 50.0,
+        ]);
+
+        $response = $client->request('PUT', "update_shuttle/$id", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/x-www-form-urlencoded',
+            ],
+            'json' => [
+                'id_jenis_mobil' => $request->id_jenis_mobil,
+                'id_fasilitas' => $request->id_fasilitas,
+            ],
+        ]);
+
+        $data = json_decode($response->getBody(), true);
+        return redirect()
+            ->route('shuttle')
+            ->withSuccess('shuttle berhasil diubah');
+    }
+
+    public function edit_shuttle($id)
+    {
+        $data['title'] = 'Edit Shuttle';
+        $token = session('access_token');
+        $client = new Client([
+        'base_uri' => 'http://travel.dlhcode.com/api/',
+        'timeout' => 2.0,
+        ]);
+    
+        $response = $client->request('GET', "get_shuttle/$id", [
+        'headers' => [
+        'Authorization' => 'Bearer ' . $token,
+        'Accept' => 'application/json',
+        ]
+        ]);
+    
+    
+        $data['shuttle'] = json_decode($response->getBody(), true);
+        $data['shuttle'] = $data['shuttle']['data'][0];
+   
+        return view('Admin.edit_shuttle', $data);
+    }
+
+    public function hapus_shuttle($id)
+    {
+        $token = session('access_token');
+        $client = new Client([
+        'base_uri' => 'http://travel.dlhcode.com/api/',
+        'timeout' => 2.0,
+        ]);
+
+        $response = $client->request('DELETE', "delete_shuttle/$id", [
+        'headers' => [
+        'Authorization' => 'Bearer ' . $token,
+        'Accept' => 'application/json',
+        ]
+        ]);
+
+        return redirect()
+            ->route('shuttle')
+            ->withSuccess('Shuttle berhasil dihapus');
+    }
 
 
     ######## PERSEDIAAN TIKET ########

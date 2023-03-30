@@ -63,21 +63,18 @@
                                         <td>{{ $nk['nama_kota'] }}</td>
                                         <td>
                                              <!-- Button trigger modal -->
-                                             <span>
-
+                                             <div class="d-flex flex-wrap gap-4">
                                                  <a href="{{ route('form.edit.kota', ['id' => $nk['id']]) }}" type="button"
-                                                    class="btn btn-primary">
+                                                    class="btn btn-soft-primary waves-effect waves-light">
                                                     <i class="dripicons-document-edit"></i></a>
-                                                </span>
-                                                <span>
 
                                                     <form action="{{ route('delete.kota', ['id' => $nk['id']]) }}" method="POST">
                                                         {{ csrf_field() }}
                                                         {{ method_field('DELETE') }}
                                                         <button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"
-                                                        class="btn btn-danger"> <i class="dripicons-trash"></i></button>
+                                                        class="btn btn-soft-danger waves-effect waves-light"> <i class="dripicons-trash"></i></button>
                                                     </form>
-                                                </span>
+                                             </div>
                                         </td>
                                     </tr>
                                     @endforeach
