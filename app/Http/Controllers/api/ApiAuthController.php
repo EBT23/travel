@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Models\User;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
