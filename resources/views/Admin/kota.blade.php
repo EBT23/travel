@@ -74,6 +74,7 @@
                                                         <button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"
                                                         class="btn btn-soft-danger waves-effect waves-light"> <i class="dripicons-trash"></i></button>
                                                     </form>
+                                                    
                                              </div>
                                         </td>
                                     </tr>

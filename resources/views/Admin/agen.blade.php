@@ -18,12 +18,12 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body col-lg">
                             <h4 class="card-title">FORM TAMBAH DATA AGEN</h4>
                             <form action="{{ route('tambah.agen') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-lg">
                                         <div class="mb-3  mt-3 mt-lg-0">
                                             <label for="nama_kota">kota</label>
 										    <select class="form-control" id="nama_kota" name="nama_kota" required>
@@ -37,7 +37,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-lg">
                                         <div class="mb-3  mt-3 mt-lg-0">
                                             <label class="form-label" for="tempat_agen">Masukkan Data</label>
                                             <input class="form-control" name="tempat_agen" id="tempat_agen">

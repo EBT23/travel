@@ -226,7 +226,7 @@ class AdminController extends Controller
         $response = $client->request('GET', "get_tempat_agen/$id", [
         'headers' => [
         'Authorization' => 'Bearer ' . $token,
-        'Accept' => 'application/json',
+        'Accept' => 'application/json',   
         ]
         ]);
     
