@@ -537,7 +537,7 @@ class ApiAllController extends Controller
             'data' => $status_transaksi
         ], Response::HTTP_OK);
     }
-    public function cetak_tiket(Request $request)
+      public function cetak_tiket(Request $request)
     {
         $order_id = $request->input('order_id');
 
@@ -550,13 +550,15 @@ where p.order_id = '$order_id'");
             return response()->json([
                 'success' => true,
                 'message' => 'Data tersedia',
-                'data' => $cetakTiket[0]
+                'data' => [$cetakTiket[0]],
+                'data1' => $cetakTiket[0]
             ], Response::HTTP_OK);
         } else {
             return response()->json([
                 'success' => false,
                 'message' => 'Data tidak tersedia',
-                'data' => $cetakTiket[0]
+                'data' => [$cetakTiket[0]],
+                'data1' => $cetakTiket[0]
             ], Response::HTTP_OK);
         }
     }
