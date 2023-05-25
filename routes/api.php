@@ -85,4 +85,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/update_tempat_agen/{id}', [ApiAllController::class, 'update_tempat_agen']);
     Route::delete('/delete_tempat_agen/{id}', [ApiAllController::class, 'delete_tempat_agen']);
     Route::get('/get_tempat_agen/{id}', [ApiAllController::class, 'get_tempat_agen']);
+
+    //Tracking
+    Route::get('/tracking', [ApiAllController::class, 'tracking']);
+    Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
 });

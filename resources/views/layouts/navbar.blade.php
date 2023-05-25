@@ -5,19 +5,19 @@
 			<div class="navbar-brand-box">
 				<a href="{{ route('dashboard') }}" class="logo logo-dark">
 					<span class="logo-sm">
-						<img src="{{ asset('assets/images/logo.svg') }}" alt="" height="22">
+						<img src="{{ asset('assets/images/nunut_berkah.png') }}" alt="" height="22">
 					</span>
 					<span class="logo-lg">
-						<img src="{{ asset('assets/images/logo-dark.png') }}" alt="" height="17">
+						<img src="{{ asset('assets/images/nunut_berkah.png') }}" alt="" height="17">
 					</span>
 				</a>
 
-				<a href="{{ route('dashboard') }}" class="logo logo-light">
+				<a href="{{ route('dashboard') }}" class="logo logo-light mt-4">
 					<span class="logo-sm">
-						<img src="{{ asset('') }}assets/images/logo-light.svg" alt="" height="22">
+						<img src="{{ asset('') }}assets/images/nunut_berkah.png" alt="" height="22">
 					</span>
 					<span class="logo-lg">
-						<img src="{{ asset('') }}assets/images/logo-light.png" alt="" height="19">
+						<img src="{{ asset('') }}assets/images/nunut_berkah.png" alt="" height="80">
 					</span>
 				</a>
 			</div>
@@ -42,14 +42,17 @@
 					data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<i class="mdi mdi-magnify"></i>
 				</button>
-				<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-search-dropdown">
+				<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+					aria-labelledby="page-header-search-dropdown">
 
 					<form class="p-3">
 						<div class="form-group m-0">
 							<div class="input-group">
-								<input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+								<input type="text" class="form-control" placeholder="Search ..."
+									aria-label="Recipient's username">
 								<div class="input-group-append">
-									<button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
+									<button class="btn btn-primary" type="submit"><i
+											class="mdi mdi-magnify"></i></button>
 								</div>
 							</div>
 						</div>
@@ -66,8 +69,8 @@
 			<div class="dropdown d-inline-block">
 				<button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
 					data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<img class="rounded-circle header-profile-user" src="{{ asset('assets/images/users/avatar-1.jpg') }}"
-						alt="Header Avatar">
+					<img class="rounded-circle header-profile-user"
+						src="{{ asset('assets/images/users/avatar-1.jpg') }}" alt="Header Avatar">
 					<span class="d-none d-xl-inline-block ms-1" key="t-henry">Admin</span>
 					<i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
 				</button>
@@ -78,20 +81,22 @@
 					<a class="dropdown-item" href="#"><i class="bx bx-wallet font-size-16 align-middle me-1"></i> <span
 							key="t-my-wallet">My Wallet</span></a>
 					<a class="dropdown-item d-block" href="#"><span class="badge bg-success float-end">11</span><i
-							class="bx bx-wrench font-size-16 align-middle me-1"></i> <span key="t-settings">Settings</span></a>
-					<a class="dropdown-item" href="#"><i class="bx bx-lock-open font-size-16 align-middle me-1"></i> <span
-							key="t-lock-screen">Lock screen</span></a>
+							class="bx bx-wrench font-size-16 align-middle me-1"></i> <span
+							key="t-settings">Settings</span></a>
+					<a class="dropdown-item" href="#"><i class="bx bx-lock-open font-size-16 align-middle me-1"></i>
+						<span key="t-lock-screen">Lock screen</span></a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item text-danger" href="#"><i
-							class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Logout</span></a>
+							class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span
+							key="t-logout">Logout</span></a>
 				</div>
 			</div>
 
 			{{-- <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
-                    <i class="bx bx-cog bx-spin"></i>
-                </button>
-            </div> --}}
+				<button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
+					<i class="bx bx-cog bx-spin"></i>
+				</button>
+			</div> --}}
 
 		</div>
 	</div>

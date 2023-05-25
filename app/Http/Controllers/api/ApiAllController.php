@@ -495,10 +495,10 @@ class ApiAllController extends Controller
 
 
         $riwayat_tiket = DB::select("SELECT p.*, pt.tgl_keberangkatan, pt.kuota, pt.estimasi_perjalanan, pt.harga, ta.tempat_agen as asal, tt.tempat_agen as tujuan FROM pemesanan p 
-LEFT JOIN persediaan_tiket pt on p.id_persediaan_tiket=pt.id
-LEFT JOIN tempat_agen ta on pt.asal=ta.id
-LEFT JOIN tempat_agen tt on pt.tujuan=tt.id
-WHERE 1=1 $andemail  $and");
+        LEFT JOIN persediaan_tiket pt on p.id_persediaan_tiket=pt.id
+        LEFT JOIN tempat_agen ta on pt.asal=ta.id
+        LEFT JOIN tempat_agen tt on pt.tujuan=tt.id
+        WHERE 1=1 $andemail  $and");
 
 
         return response()->json([
@@ -575,6 +575,64 @@ where p.order_id = '$order_id'");
             'success' => true,
             'message' => 'Data berhasil diupdate',
             'data' => $updateTransaksi
+        ], Response::HTTP_OK);
+    }
+    public function tracking()
+    {
+        $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.longitude, tracking.latitude, tracking.nama_lokasi, tracking.tgl, tracking.jam 
+                                    FROM tracking 
+                                    LEFT JOIN users 
+                                    ON tracking.id_supir = users.id
+                                    LEFT JOIN persediaan_tiket
+                                    ON tracking.id_persediaan_tiket = persediaan_tiket.id
+                                    LEFT JOIN kota AS asal_kota
+                                    ON persediaan_tiket.asal = asal_kota.id
+                                    LEFT JOIN kota AS tujuan_kota
+                                    ON persediaan_tiket.tujuan = tujuan_kota.id
+                                    WHERE users.role_id = 3");
+
+                if ($tracking != false) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Data tersedia',
+                        'data' => $tracking
+                    ], Response::HTTP_OK);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Data tidak tersedia',
+                        'data' => $tracking
+                    ], Response::HTTP_OK);
+                }
+    }
+    public function tambah_tracking(Request $request)
+    {
+        $validated = $request->validate([
+            'id_supir' => 'required',
+            'id_persediaan_tiket' => 'required',
+            'longitude' => 'required',
+            'latitude' => 'required',
+            'nama_lokasi' => 'required',
+            'tgl' => 'required',
+            'jam' => 'required',
+        ]);
+
+        // simpan data ke database
+        $tracking = DB::table('tracking')->insert([
+            'id_supir' => $request->id_supir,
+            'id_persediaan_tiket' => $request->id_persediaan_tiket,
+            'longitude' => $request->longitude,
+            'latitude' => $request->latitude,
+            'nama_lokasi' => $request->nama_lokasi,
+            'tgl' => $request->tgl,
+            'jam' => $request->jam,
+        ]);
+
+        // kirim response
+        return response()->json([
+            'success' => true,
+            'message' => 'Tracking berhasil ditambahkan',
+            'data' => $tracking
         ], Response::HTTP_OK);
     }
 }
