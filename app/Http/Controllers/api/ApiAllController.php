@@ -581,7 +581,7 @@ where p.order_id = '$order_id'");
     }
     public function tracking()
     {
-        $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.longitude, tracking.latitude, tracking.nama_lokasi, tracking.tgl, tracking.jam 
+        $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.lat_long, tracking.nama_lokasi, tracking.tgl, tracking.jam 
                                     FROM tracking 
                                     LEFT JOIN users 
                                     ON tracking.id_supir = users.id
@@ -612,8 +612,7 @@ where p.order_id = '$order_id'");
         $validated = $request->validate([
             'id_supir' => 'required',
             'id_persediaan_tiket' => 'required',
-            'longitude' => 'required',
-            'latitude' => 'required',
+            'lat_long' => 'required',
             'nama_lokasi' => 'required',
             'tgl' => 'required',
             'jam' => 'required',
@@ -623,8 +622,7 @@ where p.order_id = '$order_id'");
         $tracking = DB::table('tracking')->insert([
             'id_supir' => $request->id_supir,
             'id_persediaan_tiket' => $request->id_persediaan_tiket,
-            'longitude' => $request->longitude,
-            'latitude' => $request->latitude,
+            'lat_long' => $request->longitude,
             'nama_lokasi' => $request->nama_lokasi,
             'tgl' => $request->tgl,
             'jam' => $request->jam,
