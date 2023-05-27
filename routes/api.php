@@ -88,5 +88,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Tracking
     Route::get('/tracking', [ApiAllController::class, 'tracking']);
+    Route::get('/tracking_by_id_supir/{id}', [ApiAllController::class, 'tracking_by_id_supir']);
     Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
 });
