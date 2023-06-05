@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class AdminController extends Controller
@@ -26,7 +27,7 @@ class AdminController extends Controller
         $body_supir = $response->getBody();
         $data['users'] = json_decode($body_supir, true);
         $data['users'] = $data['users']['data'];
-        dd($data);
+        
         return view('Admin.supir', $data);
     }
     ######## KOTA ########
@@ -497,5 +498,22 @@ class AdminController extends Controller
         return redirect()
             ->route('persediaan_tiket')
             ->withSuccess('Persediaan tiket berhasil dihapus');
+    }
+    public function tracking()
+    {
+        $data['title'] = 'Tracking';
+
+        $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.lat_long, tracking.nama_lokasi, tracking.tgl, tracking.jam 
+                                    FROM tracking 
+                                    LEFT JOIN users 
+                                    ON tracking.id_supir = users.id
+                                    LEFT JOIN persediaan_tiket
+                                    ON tracking.id_persediaan_tiket = persediaan_tiket.id
+                                    LEFT JOIN kota AS asal_kota
+                                    ON persediaan_tiket.asal = asal_kota.id
+                                    LEFT JOIN kota AS tujuan_kota
+                                    ON persediaan_tiket.tujuan = tujuan_kota.id
+                                    WHERE users.role_id = 3 ORDER BY tracking.id ASC");
+        return view('Admin.tracking', compact('tracking'), $data);
     }
 }

@@ -6,7 +6,7 @@
 <div class="main-content">
     <div class="page-content">
 
-    <div class="container-fluid">
+        <div class="container-fluid">
             @if (Session::has('success'))
             <div class="alert alert-success">
                 {{ Session::get('success') }}
@@ -62,20 +62,23 @@
                                         <td>{{ $index+1 }}</td>
                                         <td>{{ $nk['nama_kota'] }}</td>
                                         <td>
-                                             <!-- Button trigger modal -->
-                                             <div class="d-flex flex-wrap gap-4">
-                                                 <a href="{{ route('form.edit.kota', ['id' => $nk['id']]) }}" type="button"
-                                                    class="btn btn-soft-primary waves-effect waves-light">
+                                            <!-- Button trigger modal -->
+                                            <div class="d-flex flex-wrap gap-4">
+                                                <a href="{{ route('form.edit.kota', ['id' => $nk['id']]) }}"
+                                                    type="button" class="btn btn-soft-primary waves-effect waves-light">
                                                     <i class="dripicons-document-edit"></i></a>
 
-                                                    <form action="{{ route('delete.kota', ['id' => $nk['id']]) }}" method="POST">
-                                                        {{ csrf_field() }}
-                                                        {{ method_field('DELETE') }}
-                                                        <button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"
-                                                        class="btn btn-soft-danger waves-effect waves-light"> <i class="dripicons-trash"></i></button>
-                                                    </form>
-                                                    
-                                             </div>
+                                                <form action="{{ route('delete.kota', ['id' => $nk['id']]) }}"
+                                                    method="POST">
+                                                    {{ csrf_field() }}
+                                                    {{ method_field('DELETE') }}
+                                                    <button onclick="return confirm('Anda yakin akan menghapus ini? ')"
+                                                        type="submit"
+                                                        class="btn btn-soft-danger waves-effect waves-light"> <i
+                                                            class="dripicons-trash"></i></button>
+                                                </form>
+
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -92,7 +95,8 @@
     <!-- End Page-content -->
 
     <!-- Static Backdrop Modal -->
-    {{-- <div class="modal fade" id="staticBackdrop" data-id="{{ $nk['id'] }} " data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="staticBackdrop" data-id="{{ $nk['id'] }} " data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">

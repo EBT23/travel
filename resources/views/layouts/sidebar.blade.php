@@ -24,7 +24,7 @@
 						<li><a href="dashboard-saas.html" key="t-saas">Pemesanan</a></li>
 						<li><a href="{{ route('persediaan_tiket') }}" key="t-saas">Persediaan</a></li>
 						<li><a href="{{ route('shuttle.index') }}" key="t-crypto">Shuttle</a></li>
-						<li><a href="dashboard-crypto.html" key="t-crypto">Tracking</a></li>
+						<li><a href="{{ route('tracking') }}" key="t-crypto">Tracking</a></li>
 						<li><a href="{{ route('agen.index') }}" key="t-blog">Tempat Agen</a></li>
 						<li><a href="{{ route('kota') }}" key="t-blog">Kota</a></li>
 					</ul>
@@ -41,8 +41,6 @@
 					<ul class="sub-menu" aria-expanded="false">
 						<li><a href="dashboard-saas.html" key="t-saas">Role</a></li>
 						<li><a href="{{ route('supir') }}" key="t-blog">Supir</a></li>
-
-
 					</ul>
 				</li>
 

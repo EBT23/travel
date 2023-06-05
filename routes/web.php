@@ -37,6 +37,8 @@ Route::post('/update_shuttle/{id}', [AdminController::class, 'update_shuttle'])-
 Route::get('/edit_shuttle/{id}', [AdminController::class, 'edit_shuttle'])->name('edit.shuttle');
 Route::delete('/delete_shuttle/{id}', [AdminController::class, 'hapus_shuttle'])->name('delete.shuttle');
 
+Route::get('/tracking', [AdminController::class, 'tracking'])->name('tracking');
+
 Route::get('/supir', [AdminController::class, 'supir'])->name('supir');
 Route::get('/kota', [AdminController::class, 'kota'])->name('kota');
 Route::post('/tambah_kota', [AdminController::class, 'tambah_kota'])->name('tambah.kota');
@@ -44,11 +46,14 @@ Route::post('/update_kota/{id}', [AdminController::class, 'update_kota'])->name(
 Route::get('/form_edit_kota/{id}', [AdminController::class, 'form_edit_kota'])->name('form.edit.kota');
 Route::delete('/delete_kota/{id}', [AdminController::class, 'hapus_kota'])->name('delete.kota');
 
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
 Route::get('/persediaan_tiket', [AdminController::class, 'persediaan_tiket'])->name('persediaan_tiket');
 Route::post('/tambah_persediaan_tiket', [AdminController::class, 'tambah_persediaan_tiket'])->name('tambah.persediaan.tiket');
 Route::post('/update_persediaan_tiket/{id}', [AdminController::class, 'update_persediaan_tiket'])->name('update.persediaan.tiket');
 Route::get('/form_edit_persediaan/{id}', [AdminController::class, 'form_edit_persediaan'])->name('form.edit.persediaan');
 Route::delete('/delete_persediaan_tiket/{id}', [AdminController::class, 'delete_persediaan_tiket'])->name('delete.persediaan.tiket');
+
 
 Route::get('/route-cache', function () {
 	Artisan::call('route:cache');

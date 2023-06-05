@@ -21,7 +21,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    
+
                                     <button type="submit" class="btn btn-success w-md">Tambah Supir</i></button>
                                 </div>
                             </form>
@@ -54,8 +54,10 @@
                                         <td>{{ $index+1 }}</td>
                                         <td>{{ $item['nama'] }}</td>
                                         <td>
-                                            <button type="button" class="btn btn-primary"> <i class="dripicons-document-edit"></i></button>
-                                            <button type="button" class="btn btn-danger"> <i class="dripicons-trash"></i></button>
+                                            <button type="button" class="btn btn-primary"> <i
+                                                    class="dripicons-document-edit"></i></button>
+                                            <button type="button" class="btn btn-danger"> <i
+                                                    class="dripicons-trash"></i></button>
                                         </td>
                                     </tr>
                                     @endforeach
