@@ -30,7 +30,7 @@
 	<link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet"
 		type="text/css" />
 	<link rel="stylesheet" href="{{ asset('assets/libs/%40chenfengyuan/datepicker/datepicker.min.css') }}">
-
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	{{-- data tables --}}
 	<!-- DataTables -->
 	<link href="{{ asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet"

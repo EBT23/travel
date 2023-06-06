@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pemesanan;
 use App\Models\Persediaan_tiket;
 use App\Models\Role;
 use App\Models\User;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
@@ -18,7 +20,26 @@ class AdminController extends Controller
     {
         $data['title'] = 'Dashboard';
 
-        return view('Admin.dashboard', $data);
+        $totalPemasukan = Pemesanan::where('status', 'lunas')
+          ->join('persediaan_tiket', 'pemesanan.id_persediaan_tiket', '=', 'persediaan_tiket.id')
+          ->sum('persediaan_tiket.harga');
+
+        $jumlahPemesan = Pemesanan::distinct('id')->count();
+        $belumBayar = Pemesanan::where('status', 'belum bayar')->distinct('id')->count();
+        $lunas = Pemesanan::where('status', 'lunas')->distinct('id')->count();
+
+        //chart
+    //     $data = Pemesanan::where('status', 'lunas')
+    //     ->join('persediaan_tiket', 'pemesanan.id_persediaan_tiket', '=', 'persediaan_tiket.id')
+    //     ->selectRaw('YEAR(pemesanan.created_at) as year, AVG(persediaan_tiket.harga) as average')
+    //     ->groupBy('year')
+    //     ->get();
+
+    //     $labels = $data->pluck('year');
+
+    //     $averages = $data->pluck('average');
+
+        return view('Admin.dashboard',compact('jumlahPemesan', 'belumBayar','lunas','totalPemasukan', 'data'));
     }
 
 
