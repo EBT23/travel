@@ -93,16 +93,20 @@
 															<td>{{ $pt['kuota'] }}</td>
 															<td>{{ $pt['estimasi_perjalanan'] . ' Jam' }}</td>
 															<td>{{ $pt['harga'] }}</td>
-															<td>
-																<a href="{{ route('form.edit.persediaan', ['id' => $pt['id']]) }}" type="button"
-																	class="btn btn-primary">
-																	<i class="dripicons-document-edit"></i></a>
-																<form action="{{ route('delete.persediaan.tiket', ['id' => $pt['id']]) }}" method="POST">
-																	{{ csrf_field() }}
-																	{{ method_field('DELETE') }}
-																	<button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"
-																		class="btn btn-danger"> <i class="dripicons-trash"></i></button>
-																</form>
+															<td class="d-flex">
+																<span>
+																	<a href="{{ route('form.edit.persediaan', ['id' => $pt['id']]) }}" type="button"
+																		class="btn btn-primary m-md-1">
+																		<i class="dripicons-document-edit"></i></a>
+																</span>
+																<span>
+																	<form action="{{ route('delete.persediaan.tiket', ['id' => $pt['id']]) }}" method="POST">
+																		{{ csrf_field() }}
+																		{{ method_field('DELETE') }}
+																		<button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"
+																			class="btn btn-danger mt-1"> <i class="dripicons-trash"></i></button>
+																	</form>
+																</span>
 															</td>
 														</tr>
 													@endforeach

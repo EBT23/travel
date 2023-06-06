@@ -21,7 +21,7 @@
 						<span key="t-dashboards">Tiket</span>
 					</a>
 					<ul class="sub-menu" aria-expanded="false">
-						<li><a href="dashboard-saas.html" key="t-saas">Pemesanan</a></li>
+						<li><a href="{{ route('pemesanan') }}" key="t-saas">Pemesanan</a></li>
 						<li><a href="{{ route('persediaan_tiket') }}" key="t-saas">Persediaan</a></li>
 						<li><a href="{{ route('shuttle.index') }}" key="t-crypto">Shuttle</a></li>
 						<li><a href="{{ route('tracking') }}" key="t-crypto">Tracking</a></li>
@@ -39,7 +39,7 @@
 						<span key="t-dashboards">Admin</span>
 					</a>
 					<ul class="sub-menu" aria-expanded="false">
-						<li><a href="dashboard-saas.html" key="t-saas">Role</a></li>
+						<li><a href="{{ route('roles') }}" key="t-saas">Role</a></li>
 						<li><a href="{{ route('supir') }}" key="t-blog">Supir</a></li>
 					</ul>
 				</li>

@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Persediaan_tiket;
+use App\Models\Role;
+use App\Models\User;
 use GuzzleHttp\Client;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
@@ -16,20 +21,191 @@ class AdminController extends Controller
         return view('Admin.dashboard', $data);
     }
 
+
     ######## SUPIR ########
     public function supir()
     {
         $data['title'] = 'Kelola Supir';
 
-        $token = session('access_token');
-
-        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/supir');
-        $body_supir = $response->getBody();
-        $data['users'] = json_decode($body_supir, true);
-        $data['users'] = $data['users']['data'];
+        $supir = DB::table('users')
+        ->join('roles','roles.id','=','users.role_id')
+        ->select('users.*','roles.roles')
+        ->where('users.role_id','=','3')
+        ->get();
         
-        return view('Admin.supir', $data);
+        return view('Admin.supir',['supir' => $supir], $data);
     }
+
+    public function tambah_supir(Request $request)
+    {
+        // Validasi input menggunakan Laravel Validator
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'no_hp' => 'required',
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $supir = [
+            'nama' => $request->nama,
+            'no_hp' => $request->no_hp,
+            'email' => $request->email,
+            'password' => bcrypt('travel123'),
+            'role_id' => '3',
+            'created_at' => now(),
+        ];
+
+        DB::table('users')->insert($supir);
+            
+        return redirect()
+        ->route('supir')
+        ->with('success', 'Data supir berhasil ditambahkan.');
+        
+    }
+
+    public function edit_supir(Request $request, $id)
+    {
+          // Validasi input menggunakan Laravel Validator
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'no_hp' => 'required',
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Update data di tabel users
+            User::where('id', $id)
+                ->update([
+                    'nama' => $request->input('nama'),
+                    'no_hp' => $request->input('no_hp'),
+                    'email' => $request->input('email'),
+                ]);
+
+        
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Data supir berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Gagal memperbarui data supir.')->withInput();
+        }
+    }
+
+    public function hapus_supir($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            DB::table('users')
+                ->where('id', $id)
+                ->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('supir')
+                ->with('success', 'Data berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()
+                ->route('supir')
+                ->with('error', 'Gagal menghapus data.');
+        }
+    }
+
+    public function roles()
+    {
+        $data['title'] = 'Kelola Roles';
+        $roles = DB::table('roles')->get();
+
+        return view('Admin.roles',['roles' => $roles], $data);
+    }
+
+    public function tambah_roles(Request $request)
+    {
+         // Validasi input menggunakan Laravel Validator
+         $validator = Validator::make($request->all(), [
+            'roles' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $roles = [
+            'roles' => $request->roles,
+            'created_at' => now(),
+        ];
+
+        DB::table('roles')->insert($roles);
+            
+        return redirect()
+            ->route('roles')
+            ->with('success', 'Data Role berhasil ditambahkan.');
+    }
+
+    public function edit_roles(Request $request, $id)
+    {
+         // Validasi input menggunakan Laravel Validator
+         $validator = Validator::make($request->all(), [
+            'roles' => 'required',
+            
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Update data di tabel roles
+            Role::where('id', $id)
+                ->update([
+                    'roles' => $request->input('roles'),
+                ]);
+
+        
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Data roles berhasil diperbarui.');
+            } catch (\Exception $e) {
+                DB::rollback();
+
+                return redirect()->back()->with('error', 'Gagal memperbarui data roles.')->withInput();
+            }
+    }
+
+    public function hapus_roles($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            DB::table('roles')
+                ->where('id', $id)
+                ->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('roles')
+                ->with('success', 'Data berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()
+                ->route('roles')
+                ->with('error', 'Gagal menghapus data.');
+        }
+    }
+
     ######## KOTA ########
     public function kota()
     {
@@ -515,5 +691,17 @@ class AdminController extends Controller
                                     ON persediaan_tiket.tujuan = tujuan_kota.id
                                     WHERE users.role_id = 3 ORDER BY tracking.id ASC");
         return view('Admin.tracking', compact('tracking'), $data);
+    }
+
+    public function pemesanan()
+    {
+        $pemesanan = DB::table('pemesanan')
+            ->join('persediaan_tiket', 'persediaan_tiket.id', '=', 'pemesanan.id_persediaan_tiket')
+            ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
+            ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
+            ->select('pemesanan.*','persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.harga','t.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan')
+            ->get();
+        
+        return view('Admin.pemesanan', compact('pemesanan'));
     }
 }

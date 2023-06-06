@@ -23,7 +23,15 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/aksi_login', [AuthController::class, 'aksi_login'])->name('aksi_login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
+
+
+
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+Route::get('/roles',[AdminController::class,'roles'])->name('roles');
+Route::post('/tambah_roles',[AdminController::class,'tambah_roles'])->name('tambah.roles');
+Route::post('/edit_roles/{id}',[AdminController::class,'edit_roles'])->name('edit.roles');
+Route::post('/hapus_roles/{id}',[AdminController::class,'hapus_roles'])->name('hapus.roles');
 
 Route::get('/agen', [AdminController::class, 'agen'])->name('agen.index');
 Route::post('/tambah_agen', [AdminController::class, 'tambah_agen'])->name('tambah.agen');
@@ -40,6 +48,10 @@ Route::delete('/delete_shuttle/{id}', [AdminController::class, 'hapus_shuttle'])
 Route::get('/tracking', [AdminController::class, 'tracking'])->name('tracking');
 
 Route::get('/supir', [AdminController::class, 'supir'])->name('supir');
+Route::post('/tambah-supir', [AdminController::class, 'tambah_supir'])->name('tambah.supir');
+Route::post('/update-supir/{id}', [AdminController::class, 'edit_supir'])->name('edit.supir');
+Route::delete('/delete-supir/{id}',[AdminController::class,'hapus_supir'])->name('hapus.supir');
+
 Route::get('/kota', [AdminController::class, 'kota'])->name('kota');
 Route::post('/tambah_kota', [AdminController::class, 'tambah_kota'])->name('tambah.kota');
 Route::post('/update_kota/{id}', [AdminController::class, 'update_kota'])->name('update.kota');
@@ -54,6 +66,7 @@ Route::post('/update_persediaan_tiket/{id}', [AdminController::class, 'update_pe
 Route::get('/form_edit_persediaan/{id}', [AdminController::class, 'form_edit_persediaan'])->name('form.edit.persediaan');
 Route::delete('/delete_persediaan_tiket/{id}', [AdminController::class, 'delete_persediaan_tiket'])->name('delete.persediaan.tiket');
 
+Route::get('/pemesanan',[AdminController::class, 'pemesanan'])->name('pemesanan');
 
 Route::get('/route-cache', function () {
 	Artisan::call('route:cache');
