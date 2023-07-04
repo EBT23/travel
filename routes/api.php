@@ -40,6 +40,11 @@ Route::post('/cetak_tiket', [ApiAllController::class, 'cetak_tiket']);
 
 Route::post('/updateTransaksi', [ApiAllController::class, 'updateTransaksi']);
 
+ //Tracking
+    Route::get('/tracking', [ApiAllController::class, 'tracking']);
+    Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
+    Route::get('/persediaan_tiket', [ApiAllController::class, 'persediaan_tiket']);
+    Route::post('/tracking_by_id_supir', [ApiAllController::class, 'tracking_by_id_supir']);
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -62,7 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/delete_shuttle/{id}', [ApiAllController::class, 'delete_shuttle']);
     Route::get('/get_shuttle/{id}', [ApiAllController::class, 'get_shuttle']);
     //PERSEDIAAN TIKET
-    Route::get('/persediaan_tiket', [ApiAllController::class, 'persediaan_tiket']);
+
     Route::post('/tambah_persediaan_tiket', [ApiAllController::class, 'tambah_persediaan_tiket']);
     Route::put('/update_persediaan_tiket/{id}', [ApiAllController::class, 'update_persediaan_tiket']);
     Route::delete('/delete_persediaan_tiket/{id}', [ApiAllController::class, 'delete_persediaan_tiket']);
@@ -85,13 +90,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/update_tempat_agen/{id}', [ApiAllController::class, 'update_tempat_agen']);
     Route::delete('/delete_tempat_agen/{id}', [ApiAllController::class, 'delete_tempat_agen']);
     Route::get('/get_tempat_agen/{id}', [ApiAllController::class, 'get_tempat_agen']);
-
-    //Tracking
-    Route::get('/tracking', [ApiAllController::class, 'tracking']);
-    Route::get('/tracking_by_id_supir/{id}', [ApiAllController::class, 'tracking_by_id_supir']);
-    Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
-
-    //Seat
+    
+     //Seat
     Route::post('/reservasi_seat', [ApiAllController::class, 'reservasi_seat']);
     Route::get('/get_ketersediaan_seat', [ApiAllController::class, 'get_ketersediaan_seat']);
+
 });

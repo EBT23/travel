@@ -65,7 +65,7 @@ class ApiAllController extends Controller
     }
     public function tambah_shuttle(Request $request)
     {
-         // validasi input
+        // validasi input
          $validated = $request->validate([
             'jenis_mobil' => 'required',
             'kapasitas' => 'required',
@@ -109,7 +109,7 @@ class ApiAllController extends Controller
     }
     public function persediaan_tiket()
     {
-        $persediaan_tiket = DB::table('persediaan_tiket')
+       $persediaan_tiket = DB::table('persediaan_tiket')
             ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
             ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
             ->join('shuttle','shuttle.id','=','persediaan_tiket.id_shuttle')
@@ -117,7 +117,7 @@ class ApiAllController extends Controller
             'persediaan_tiket.kuota', 'persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 
             'tempat_agen.tempat_agen AS tujuan','shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
             ->get();
-
+            
         return response()->json([
             'success' => true,
             'message' => 'Data berhasil ditampilkan',
@@ -298,7 +298,7 @@ class ApiAllController extends Controller
         $kota = Kota::all();
         $tmagen = DB::table('tempat_agen')
             ->join('kota', 'kota.id', '=', 'tempat_agen.kota_id')
-            ->select('tempat_agen.id','tempat_agen.kota_id', 'kota.nama_kota', 'tempat_agen.tempat_agen')
+            ->select('tempat_agen.id', 'tempat_agen.kota_id','kota.nama_kota', 'tempat_agen.tempat_agen')
             ->get();
         return response()->json([
             'data' => $tmagen,
@@ -419,7 +419,7 @@ class ApiAllController extends Controller
     }
     public function get_persediaan($id)
     {
-        $persediaan_tiket = DB::table('persediaan_tiket')
+         $persediaan_tiket = DB::table('persediaan_tiket')
             ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
             ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
             ->join('shuttle','shuttle.id','=','persediaan_tiket.id_shuttle')
@@ -434,7 +434,7 @@ class ApiAllController extends Controller
     }
     public function get_shuttle($id)
     {
-        $shuttle = DB::table('shuttle')->where('shuttle.id','=', $id)
+         $shuttle = DB::table('shuttle')->where('shuttle.id','=', $id)
             ->select('shuttle.id','shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
             ->get();
 
@@ -466,9 +466,9 @@ class ApiAllController extends Controller
     public function get_tempat_agen($id)
     {
         $kota = DB::table('tempat_agen')
-            ->join('kota','kota.id', '=', 'tempat_agen.kota_id')
+            ->join('kota', 'kota.id', '=', 'tempat_agen.kota_id' )
             ->where('tempat_agen.id', '=', $id)
-            ->select('tempat_agen.id', 'tempat_agen.kota_id', 'kota.nama_kota', 'tempat_agen.tempat_agen')
+            ->select('tempat_agen.kota_id', 'kota.nama_kota', 'tempat_agen.tempat_agen')
             ->get();
         return response()->json([
             'success' => true,
@@ -576,7 +576,7 @@ where p.order_id = '$order_id'");
     }
     public function tracking()
     {
-        $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.lat_long, tracking.nama_lokasi, tracking.tgl, tracking.jam 
+        $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.longitude, tracking.latitude, tracking.nama_lokasi, tracking.tgl, tracking.jam 
                                     FROM tracking 
                                     LEFT JOIN users 
                                     ON tracking.id_supir = users.id
@@ -602,6 +602,8 @@ where p.order_id = '$order_id'");
                     ], Response::HTTP_OK);
                 }
     }
+    
+   
     public function tambah_tracking(Request $request)
     {
         $validated = $request->validate([
@@ -613,15 +615,11 @@ where p.order_id = '$order_id'");
             'jam' => 'required',
         ]);
 
-        if ($request->id_persediaan_tiket == '' || $request->longitude == '') {
-            return redirect()->back();
-        }
-
         // simpan data ke database
         $tracking = DB::table('tracking')->insert([
             'id_supir' => $request->id_supir,
             'id_persediaan_tiket' => $request->id_persediaan_tiket,
-            'lat_long' => $request->longitude,
+            'lat_long' => $request->lat_long,
             'nama_lokasi' => $request->nama_lokasi,
             'tgl' => $request->tgl,
             'jam' => $request->jam,
@@ -634,8 +632,9 @@ where p.order_id = '$order_id'");
             'data' => $tracking
         ], Response::HTTP_OK);
     }
-    public function tracking_by_id_supir($id)
+    public function tracking_by_id_supir(Request $request)
     {
+        
         $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.lat_long, tracking.nama_lokasi, tracking.tgl, tracking.jam 
                                     FROM tracking 
                                     LEFT JOIN users 
@@ -647,7 +646,7 @@ where p.order_id = '$order_id'");
                                     LEFT JOIN kota AS tujuan_kota
                                     ON persediaan_tiket.tujuan = tujuan_kota.id
                                     WHERE users.role_id = 3
-                                    AND users.id = $id");
+                                    AND users.id = '$request->id'");
 
                 if ($tracking != false) {
                     return response()->json([
@@ -663,9 +662,8 @@ where p.order_id = '$order_id'");
                     ], Response::HTTP_OK);
                 }
     }
-
-
-    public function reservasi_seat(Request $request)
+    
+     public function reservasi_seat(Request $request)
     {
         $nomer_seat = $request->input('no_kursi');
 
@@ -717,5 +715,6 @@ where p.order_id = '$order_id'");
                 'seats' => $seats
             ], 200);
     }
+
 
 }
