@@ -92,5 +92,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
 
     Route::post('/cek_ketersediaan', [ApiAllController::class, 'cek_ketersediaan']);
-    Route::post('/booked_seat', [SeatController::class, 'booked_seat']);
+    Route::post('/booked_seat', [ApiAllController::class, 'booked_seat']);
 });
