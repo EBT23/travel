@@ -11,7 +11,14 @@ class Shuttle extends Model
     protected $table = 'shuttle'; //nama tabel pada database
 
     protected $fillable = [ //kolom yang diizinkan diisi secara massal
-        'id_jenis_mobil',
-        'id_fasilitas',
+        'id',
+        'jenis_mobil',
+        'kapasitas',
+        'fasilitas',
     ];
+
+    public function seats()
+    {
+        return $this->hasMany(Kursi::class);
+    }
 }

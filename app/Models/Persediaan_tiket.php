@@ -16,6 +16,7 @@ class Persediaan_tiket extends Model
         'asal',
         'tujuan',
         'kuota',
+        'id_shuttle',
         'estimasi_perjalanan',
         'harga'
     ];

@@ -19,19 +19,28 @@
 					<div class="col-lg-12">
 						<div class="card">
 							<div class="card-body">
-								<h4 class="card-title">FORM TAMBAH DATA SHUTTLE</h4>
-								<formaction="{{ route('tambah.shuttle') }}" method="POST" enctype="multipart/form-data">
+								<h4 class="card-title">FORM TAMBAH DATA ARMADA</h4>
+								<hr>
+								<form action="{{ route('tambah.shuttle') }}" method="POST" enctype="multipart/form-data">
 									@csrf
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="mb-3  mt-3 mt-lg-0">
-												<label class="form-label" for="jenis_mobil">Masukkan Data</label>
-												<input class="form-control" name="jenis_mobil" id="jenis_mobil">
+												<label class="form-label" for="jenis_mobil">Jenis Mobil</label>
+												<input type="text" class="form-control" id="jenis_mobil" name="jenis_mobil" placeholder="Masukkan Jenis Mobil">
+											</div>
+											<div class="mb-3  mt-3 mt-lg-0">
+												<label class="form-label" for="kapasitas">Kapasitas</label>
+												<input type="text" class="form-control" id="kapasitas" name="kapasitas" placeholder="Masukan kapasitas">
+											</div>
+											<div class="mb-3  mt-3 mt-lg-0">
+												<label class="form-label" for="fasilitas">Fasilitas</label>
+												<input type="text" class="form-control" id="fasilitas" name="fasilitas" placeholder="Masukan fasilitas">
 											</div>
 										</div>
 									</div>
 									<div>
-										<button type="submit" class="btn btn-success w-md">Tambah Shuttle</i></button>
+										<button type="submit" class="btn btn-success w-md">Tambah</i></button>
 									</div>
 								</form>
 
@@ -43,12 +52,13 @@
 					<div class="col-12">
 						<div class="card">
 							<div class="card-body">
-								<h4 class="card-title my-2">Data Shuttle</h4>
+								<h4 class="card-title my-2">Data Armada</h4>
 								<table id="datatable" class="table table-bordered dt-responsive  nowrap w-100 text-center">
 									<thead>
 										<tr>
 											<th width="5%">No</th>
-											<th>Jenis Shuttle</th>
+											<th>Jenis Armada</th>
+											<th>Kapasitas</th>
 											<th>Nama Fasilitas</th>
 											<th width="15%">Aksi</th>
 										</tr>
@@ -58,7 +68,8 @@
 											<tr>
 												<td>{{ $index + 1 }}</td>
 												<td>{{ $s['jenis_mobil'] }}</td>
-												<td>{{ $s['nama_fasilitas'] }}</td>
+												<td>{{ $s['kapasitas'] }}</td>
+												<td>{{ $s['fasilitas'] }}</td>
 												<td>
 													<div class="d-flex flex-wrap gap-4">
 														<a href="{{ route('edit.shuttle', ['id' => $s['id']]) }}" type="button"

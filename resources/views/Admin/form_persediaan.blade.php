@@ -47,6 +47,16 @@
 											aria-describedby="kuota">
 									</div>
 									<div class="form-group mt-3">
+										<label for="id_shuttle">Armada</label>
+										<select class="form-control" id="id_shuttle" name="id_shuttle" required>
+											<option  selected disabled value="">Pilih armada</option>
+											@foreach ($shuttle as $sh)
+												<option <?= $persediaan['id_shuttle'] == $sh['id'] ? 'selected' : '' ?> value="{{ $sh['id'] }}">
+													{{ $sh['jenis_mobil'] }}</option>
+											@endforeach
+										</select>
+									</div>
+									<div class="form-group mt-3">
 										<label for="estimasi_perjalanan">Estimasi Perjalanan</label>
 										<input type="number" class="form-control" id="estimasi_perjalanan"
 											value="{{ $persediaan['estimasi_perjalanan'] }}" name="estimasi_perjalanan"

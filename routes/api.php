@@ -90,4 +90,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/tracking', [ApiAllController::class, 'tracking']);
     Route::get('/tracking_by_id_supir/{id}', [ApiAllController::class, 'tracking_by_id_supir']);
     Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
+
+    Route::post('/cek_ketersediaan', [ApiAllController::class, 'cek_ketersediaan']);
+    Route::post('/booked_seat', [SeatController::class, 'booked_seat']);
 });

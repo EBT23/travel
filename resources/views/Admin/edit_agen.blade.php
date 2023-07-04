@@ -10,20 +10,24 @@
 						<div class="card">
 							<div class="card-body">
 								<h4 class="card-title">{{ $title }}</h4>
-								<form action="{{ route('update.agen', ['id' => $tempat_agen['id']]) }}" method="POST"
+								<form action="{{ route('update.agen', $tempat_agen->id) }}" method="POST"
 									enctype="multipart/form-data">
 									@csrf
 									<div class="form-group mt-3">
-										<label for="kota_id">Nama Kota</label>
-										<input type="text" class="form-control" id="kota_id"
-											value="{{ $tempat_agen['nama_kota'] }}" name="kota_id"
-											aria-describedby="kota_id" required>
+										<label for="nama_kota">kota</label>
+										<select class="form-control" id="kota_id" name="kota_id" required>
+										<option value="" selected disabled>Pilih kota</option>
+										@foreach ($kota as $sh)
+												<option <?= $tempat_agen->kota_id == $sh->id ? 'selected' : '' ?> value="{{ $sh->id }}">
+													{{ $sh->nama_kota }}</option>
+											@endforeach
+									</select>
 									</div>
 
 									<div class="form-group mt-3">
 										<label for="tempat_agen">Tempat Agen</label>
 										<input type="text" class="form-control" id="tempat_agen"
-											value="{{ $tempat_agen['tempat_agen'] }}" name="tempat_agen"
+											value="{{ $tempat_agen->tempat_agen }}" name="tempat_agen"
 											aria-describedby="tempat_agen" required>
 									</div>
 									<button type="submit" class="btn btn-primary mt-3">Submit</button>

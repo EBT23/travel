@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pemesanan;
 use App\Models\Persediaan_tiket;
 use App\Models\Role;
+use App\Models\TempatAgen;
 use App\Models\User;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
@@ -361,78 +362,56 @@ class AdminController extends Controller
 
     public function tambah_agen(Request $request)
     {
-        $token = session('access_token');
+         // Validasi input menggunakan Laravel Validator
+         $validator = Validator::make($request->all(), [
+            'kota_id' => 'required',
+            'tempat_agen' => 'required',
+        ]);
 
-        $addAgen = [
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $data = [
             'kota_id' => $request->kota_id,
             'tempat_agen' => $request->tempat_agen,
+            'created_at' => now(),
         ];
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token, // token autentikasi
-            'Accept' => 'application/json', // format respon
-        ])->post('http://travel.dlhcode.com/api/tambah_agen', $addAgen);
 
-        if ($response->ok()) {
-            $response->json(); // data response jika request sukses
-            // lakukan sesuatu dengan data response
-            return redirect()
-                ->route('agen.index')
-                ->withSuccess('Tempat agen berhasil ditambahkan');
-        } else {
-            $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
-            $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
-            // lakukan sesuatu dengan pesan error
-            return redirect()->route('agen.index')
-                ->with('error', 'Tempat agen gagal disimpan');
-        }
+        DB::table('tempat_agen')->insert($data);
+            
+        return redirect()
+        ->route('agen.index')
+        ->with('success', 'Data berhasil ditambahkan.');
     }
 
     public function update_agen(Request $request, $id)
     {
-        $token = session('access_token');
-        $client = new Client([
-            'base_uri' => 'http://travel.dlhcode.com/api/',
-            'timeout' => 50.0,
+          // Validasi input menggunakan Laravel Validator
+          $validator = Validator::make($request->all(), [
+            'kota_id' => 'required',
+            'tempat_agen' => 'required',
+            
         ]);
 
-        $response = $client->request('PUT', "update_tempat_agen/$id", [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/x-www-form-urlencoded',
-            ],
-            'json' => [
-                'kota_id' => $request->kota_id,
-                'tempat_agen' => $request->tempat_agen,
-            ],
-        ]);
+        $user = TempatAgen::find($id);
+        $user->kota_id = $request->input('kota_id');
+        $user->tempat_agen = $request->input('tempat_agen');
+        // Jika ada kolom tambahan yang ingin diubah, tambahkan di sini
 
-        $data = json_decode($response->getBody(), true);
+        $user->save();
+        
         return redirect()
-            ->route('agen')
-            ->withSuccess('Tempat agen berhasil diubah');
+            ->route('agen.index')
+            ->with('success', 'Data berhasil diperbarui.');
     }
 
     public function edit_agen($id)
     {
         $data['title'] = 'Edit Agen';
-        $token = session('access_token');
-        $client = new Client([
-        'base_uri' => 'http://travel.dlhcode.com/api/',
-        'timeout' => 2.0,
-        ]);
-    
-        $response = $client->request('GET', "get_tempat_agen/$id", [
-        'headers' => [
-        'Authorization' => 'Bearer ' . $token,
-        'Accept' => 'application/json',   
-        ]
-        ]);
-    
-    
-        $data['tempat_agen'] = json_decode($response->getBody(), true);
-        $data['tempat_agen'] = $data['tempat_agen']['data'][0];
+        $tempat_agen  = TempatAgen::find($id);
+        $kota = DB::table('kota')->get();
    
-        return view('Admin.edit_agen', $data);
+        return view('Admin.edit_agen',compact('tempat_agen','kota'), $data);
     }
 
     public function hapus_tempat_agen($id)
@@ -458,7 +437,7 @@ class AdminController extends Controller
     ######## SHUTTLE ########
     public function shuttle()
     {
-        $data['title'] = 'Kelola Shuttle';
+        $data['title'] = 'Kelola Armada';
         $token = session('access_token');
         $client = new Client([
             'base_uri' => 'http://travel.dlhcode.com/api/',
@@ -483,8 +462,9 @@ class AdminController extends Controller
         $token = session('access_token');
 
         $addShuttle = [
-            'id_jenis_mobil' => $request->id_jenis_mobil,
-            'id_fasilitas' => $request->id_fasilitas,
+            'jenis_mobil' => $request->jenis_mobil,
+            'kapasitas' => $request->kapasitas,
+            'fasilitas' => $request->fasilitas,
         ];
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token, // token autentikasi
@@ -495,14 +475,14 @@ class AdminController extends Controller
             $response->json(); // data response jika request sukses
             // lakukan sesuatu dengan data response
             return redirect()
-                ->route('kota')
-                ->withSuccess('Kota berhasil ditambahkan');
+                ->route('shuttle.index')
+                ->withSuccess('Armada berhasil ditambahkan');
         } else {
             $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
             $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
             // lakukan sesuatu dengan pesan error
-            return redirect()->route('kota')
-                ->with('error', 'Kota gagal disimpan');
+            return redirect()->route('shuttle.index')
+                ->with('error', 'Armada gagal disimpan');
         }
     }
 
@@ -520,14 +500,15 @@ class AdminController extends Controller
                 'Accept' => 'application/x-www-form-urlencoded',
             ],
             'json' => [
-                'id_jenis_mobil' => $request->id_jenis_mobil,
-                'id_fasilitas' => $request->id_fasilitas,
+                'jenis_mobil' => $request->jenis_mobil,
+                'kapasitas' => $request->kapasitas,
+                'fasilitas' => $request->fasilitas,
             ],
         ]);
 
         $data = json_decode($response->getBody(), true);
         return redirect()
-            ->route('shuttle')
+            ->route('shuttle.index')
             ->withSuccess('shuttle berhasil diubah');
     }
 
@@ -570,7 +551,7 @@ class AdminController extends Controller
         ]);
 
         return redirect()
-            ->route('shuttle')
+            ->route('shuttle.index')
             ->withSuccess('Shuttle berhasil dihapus');
     }
 
@@ -578,7 +559,7 @@ class AdminController extends Controller
     ######## PERSEDIAAN TIKET ########
     public function persediaan_tiket()
     {
-        $data['title'] = 'Persediaan Tiket';
+        $data['title'] = 'Jadwal Keberangkatan';
         $token = session('access_token');
         $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/persediaan_tiket');
 
@@ -589,6 +570,11 @@ class AdminController extends Controller
         $body_tempat_agen = $response->getBody();
         $data['tempat_agen'] = json_decode($body_tempat_agen, true);
         $data['tempat_agen'] = $data['tempat_agen']['data'];
+
+        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/shuttle');
+        $body_shuttle = $response->getBody();
+        $data['shuttle'] = json_decode($body_shuttle, true);
+        $data['shuttle'] = $data['shuttle']['data'];
 
         return view('Admin.persediaan_tiket', $data);
     }
@@ -601,6 +587,7 @@ class AdminController extends Controller
             'asal' => $request->asal,
             'tujuan' => $request->tujuan,
             'kuota' => $request->kuota,
+            'id_shuttle' => $request->id_shuttle,
             'estimasi_perjalanan' => $request->estimasi_perjalanan,
             'harga' => $request->harga,
         ];
@@ -642,6 +629,7 @@ class AdminController extends Controller
                 'asal' => $request->asal,
                 'tujuan' => $request->tujuan,
                 'kuota' => $request->kuota,
+                'id_shuttle' => $request->id_shuttle,
                 'estimasi_perjalanan' => $request->estimasi_perjalanan,
                 'harga' => $request->harga,
             ],
@@ -674,6 +662,11 @@ class AdminController extends Controller
         $body_tempat_agen = $response->getBody();
         $data['tempat_agen'] = json_decode($body_tempat_agen, true);
         $data['tempat_agen'] = $data['tempat_agen']['data'];
+        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/shuttle');
+        $body_shuttle = $response->getBody();
+        $data['shuttle'] = json_decode($body_shuttle, true);
+        $data['shuttle'] = $data['shuttle']['data'];
+
 
         return view('Admin.form_persediaan', $data);
     }

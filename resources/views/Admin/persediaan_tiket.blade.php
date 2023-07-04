@@ -51,6 +51,15 @@
 										<input type="number" class="form-control" id="kuota" name="kuota" aria-describedby="kuota">
 									</div>
 									<div class="form-group mt-3">
+										<label for="asal">Armada</label>
+										<select class="form-control" id="id_shuttle" name="id_shuttle" required>
+											<option value="">Pilih armada</option>
+											@foreach ($shuttle as $sh)
+												<option value="{{ $sh['id'] }}">{{ $sh['jenis_mobil'] }}</option>
+											@endforeach
+										</select>
+									</div>
+									<div class="form-group mt-3">
 										<label for="estimasi_perjalanan">Estimasi Perjalanan</label>
 										<input type="number" class="form-control" id="estimasi_perjalanan" name="estimasi_perjalanan"
 											aria-describedby="estimasi_perjalanan">
@@ -66,19 +75,23 @@
 								<div class="col-12">
 									<div class="card">
 										<div class="card-body">
-											<h4 class="card-title my-2">Data Persediaan</h4>
-											<table id="datatable" class="table table-bordered dt-responsive  nowrap w-100 text-center">
+											<h4 class="card-title my-2">Data Jadwal Keberangkatan</h4>
+											<table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
 												<thead>
 													<tr>
-														<th width="5%">No</th>
-														<th>Tanggal Keberangkatan</th>
-														<th>Jam Keberangkatan</th>
-														<th>Asal</th>
-														<th>Tujuan</th>
-														<th>Kuota</th>
-														<th>estimasi_perjalanan</th>
-														<th>Harga</th>
-														<th width="15%">Aksi</th>
+														<th rowspan="2" class="text-center" width="5%">No</th>
+														<th rowspan="2" class="text-center">Tanggal Keberangkatan</th>
+														<th rowspan="2" class="text-center">Jam Keberangkatan</th>
+														<th colspan="2" class="text-center">Rute</th>
+														<th rowspan="2" class="text-center">Kuota</th>
+														<th rowspan="2" class="text-center">Armada</th>
+														<th rowspan="2" class="text-center">Estimasi Perjalanan</th>
+														<th rowspan="2" class="text-center">Harga</th>
+														<th rowspan="2" class="text-center" width="15%">Aksi</th>
+													</tr>
+													<tr>
+														<th class="text-center">Asal</th>
+														<th class="text-center">Tujuan</th>
 													</tr>
 												</thead>
 												<tbody>
@@ -86,15 +99,16 @@
 													@foreach ($persediaan_tiket as $pt)
 														<tr>
 															<td>{{ $no++ }}</td>
-															<td>{{ date('d-m-Y', strtotime($pt['tgl_keberangkatan'])) }}</td>
-															<td>{{ date('H:i', strtotime($pt['tgl_keberangkatan'])) . ' WIB' }}</td>
-															<td>{{ $pt['asal'] }}</td>
-															<td>{{ $pt['tujuan'] }}</td>
-															<td>{{ $pt['kuota'] }}</td>
-															<td>{{ $pt['estimasi_perjalanan'] . ' Jam' }}</td>
-															<td>{{ $pt['harga'] }}</td>
-															<td class="d-flex">
-																<span>
+															<td class="text-center">{{ date('d-m-Y', strtotime($pt['tgl_keberangkatan'])) }}</td>
+															<td class="text-center">{{ date('H:i', strtotime($pt['tgl_keberangkatan'])) . ' WIB' }}</td>
+															<td class="text-center">{{ $pt['asal'] }}</td>
+															<td class="text-center">{{ $pt['tujuan'] }}</td>
+															<td class="text-center">{{ $pt['kuota'] }}</td>
+															<td class="text-center">{{ $pt['jenis_mobil'] }}</td>
+															<td class="text-center">{{ $pt['estimasi_perjalanan'] . ' Jam' }}</td>
+															<td class="text-center">{{ $pt['harga'] }}</td>
+															<td class="d-sm-flex">
+																<span class="text-center">
 																	<a href="{{ route('form.edit.persediaan', ['id' => $pt['id']]) }}" type="button"
 																		class="btn btn-primary m-md-1">
 																		<i class="dripicons-document-edit"></i></a>
@@ -112,23 +126,17 @@
 													@endforeach
 												</tbody>
 											</table>
-
 										</div>
 									</div>
 								</div> <!-- end col -->
 							</div>
 						</div>
-
 					</div>
-
-
 				</div>
 				<!-- end row -->
 			</div>
 			<!-- container-fluid -->
 		</div>
 		<!-- End Page-content -->
-
-
 	</div>
 @endsection

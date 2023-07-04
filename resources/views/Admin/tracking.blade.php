@@ -25,10 +25,8 @@
                                     <thead>
                                         <tr>
                                             <th width="5%">No</th>
-                                            <th>Asal</th>
-                                            <th>Tujuan</th>
+                                            <th>Perjalanan Mobil</th>
                                             <th>Lat, Long</th>
-                                            <th>Nama Lokasi</th>
                                             <th>Waktu</th>
                                         </tr>
                                     </thead>
@@ -36,10 +34,8 @@
                                         @foreach ($tracking as $index => $ta)
                                         <tr>
                                             <td>{{ $index+1 }}</td>
-                                            <td>{{ $ta->nama_kota }}</td>
-                                            <td>{{ $ta->tujuan }}</td>
-                                            <td>{{ $ta->lat_long }}</td>
                                             <td>{{ $ta->nama_lokasi }}</td>
+                                            <td>{{ $ta->lat_long }}</td>
                                             <td>{{ $ta->tgl.' '.$ta->jam }}</td>
                                         </tr>
                                         @endforeach

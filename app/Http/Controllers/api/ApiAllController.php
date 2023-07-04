@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use App\Models\Persediaan_tiket;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Kursi;
 use Illuminate\Foundation\Auth\User;
 
 class ApiAllController extends Controller
@@ -54,12 +55,8 @@ class ApiAllController extends Controller
         return response()->json(null, 204);
     }
     public function shuttle()
-    {
-        $shuttle = DB::table('shuttle')
-            ->join('jenis_mobil', 'shuttle.id_jenis_mobil', '=', 'jenis_mobil.id')
-            ->join('fasilitas', 'shuttle.id_fasilitas', '=', 'fasilitas.id')
-            ->select('shuttle.id', 'jenis_mobil.jenis_mobil', 'fasilitas.nama_fasilitas')
-            ->get();
+    {   
+        $shuttle = DB::table('shuttle')->get();
 
         return response()->json([
             'success' => true,
@@ -68,32 +65,25 @@ class ApiAllController extends Controller
     }
     public function tambah_shuttle(Request $request)
     {
-        $validated = $request->validate([
-            'id_jenis_mobil' => 'required',
-            'id_fasilitas' => 'required',
+         // validasi input
+         $validated = $request->validate([
+            'jenis_mobil' => 'required',
+            'kapasitas' => 'required',
+            'fasilitas' => 'required',
         ]);
 
-        $cek = DB::table('shuttle')
-            ->where('id_jenis_mobil', '=', $request->id_jenis_mobil)
-            ->where('id_fasilitas', '=', $request->id_fasilitas)
-            ->count();
+        // simpan data ke database
+        $data = new Shuttle;
+        $data->jenis_mobil = $validated['jenis_mobil'];
+        $data->kapasitas = $validated['kapasitas'];
+        $data->fasilitas = $validated['fasilitas'];
+        $data->save();
 
-        if ($cek > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data gagal ditambahkan karena sudah ada',
-            ]);
-        }
-
-        $shuttle = DB::table('shuttle')->insert([
-            'id_jenis_mobil' => $request->id_jenis_mobil,
-            'id_fasilitas' => $request->id_fasilitas
-        ]);
-
+        // kirim response
         return response()->json([
             'success' => true,
-            'message' => 'Shuttle berhasil dibuat',
-            'data' => $shuttle
+            'message' => 'Armada berhasil dibuat',
+            'data' => $data
         ], Response::HTTP_OK);
     }
 
@@ -103,7 +93,7 @@ class ApiAllController extends Controller
         $shuttle->update($request->all());
         return response()->json([
             'success' => true,
-            'message' => 'Shuttle berhasil dirubah',
+            'message' => 'Armada berhasil dirubah',
             'data' => $shuttle
         ]);
     }
@@ -113,7 +103,7 @@ class ApiAllController extends Controller
         $shuttle->delete();
         return response()->json([
             'success' => true,
-            'message' => 'Shuttle berhasil dihapus',
+            'message' => 'Armada berhasil dihapus',
             'data' => $shuttle
         ]);
     }
@@ -122,8 +112,12 @@ class ApiAllController extends Controller
         $persediaan_tiket = DB::table('persediaan_tiket')
             ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
             ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
-            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.kuota', 'persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan')
+            ->join('shuttle','shuttle.id','=','persediaan_tiket.id_shuttle')
+            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.tgl_keberangkatan', 
+            'persediaan_tiket.kuota', 'persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 
+            'tempat_agen.tempat_agen AS tujuan','shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
             ->get();
+
         return response()->json([
             'success' => true,
             'message' => 'Data berhasil ditampilkan',
@@ -137,6 +131,7 @@ class ApiAllController extends Controller
             'asal' => 'required',
             'tujuan' => 'required',
             'kuota' => 'required',
+            'id_shuttle' => 'required',
             'estimasi_perjalanan' => 'required',
             'harga' => 'required',
         ]);
@@ -146,6 +141,7 @@ class ApiAllController extends Controller
             'asal' => $request->asal,
             'tujuan' => $request->tujuan,
             'kuota' => $request->kuota,
+            'id_shuttle' => $request->id_shuttle,
             'estimasi_perjalanan' => $request->estimasi_perjalanan,
             'harga' => $request->harga,
         ]);
@@ -302,7 +298,7 @@ class ApiAllController extends Controller
         $kota = Kota::all();
         $tmagen = DB::table('tempat_agen')
             ->join('kota', 'kota.id', '=', 'tempat_agen.kota_id')
-            ->select('tempat_agen.id', 'kota.nama_kota', 'tempat_agen.tempat_agen')
+            ->select('tempat_agen.id','tempat_agen.kota_id', 'kota.nama_kota', 'tempat_agen.tempat_agen')
             ->get();
         return response()->json([
             'data' => $tmagen,
@@ -408,7 +404,8 @@ class ApiAllController extends Controller
         $persediaan_tiket = DB::table('persediaan_tiket')
             ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
             ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
-            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.kuota', 'persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan')
+            ->join('shuttle','shuttle.id','=','persediaan_tiket.id_shuttle')
+            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.kuota', 'persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan','shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
             ->where('asal', $asal)
             ->where('tujuan', $tujuan)
             ->where('tgl_keberangkatan', 'like', '%' . $tgl_keberangkatan . '%')
@@ -425,8 +422,9 @@ class ApiAllController extends Controller
         $persediaan_tiket = DB::table('persediaan_tiket')
             ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
             ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
+            ->join('shuttle','shuttle.id','=','persediaan_tiket.id_shuttle')
             ->where('persediaan_tiket.id', '=', $id)
-            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.kuota', 'persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan')
+            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.kuota', 'persediaan_tiket.id_shuttle','persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan', 'shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
             ->get();
         return response()->json([
             'success' => true,
@@ -436,11 +434,8 @@ class ApiAllController extends Controller
     }
     public function get_shuttle($id)
     {
-        $shuttle = DB::table('shuttle')
-            ->join('jenis_mobil', 'shuttle.id_jenis_mobil', '=', 'jenis_mobil.id')
-            ->join('fasilitas', 'shuttle.id_fasilitas', '=', 'fasilitas.id')
-            ->where('shuttle.id', '=', $id)
-            ->select('shuttle.id', 'shuttle.id_jenis_mobil', 'shuttle.id_fasilitas', 'jenis_mobil.jenis_mobil', 'fasilitas.nama_fasilitas')
+        $shuttle = DB::table('shuttle')->where('shuttle.id','=', $id)
+            ->select('shuttle.id','shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
             ->get();
 
         return response()->json([
@@ -471,7 +466,7 @@ class ApiAllController extends Controller
     public function get_tempat_agen($id)
     {
         $kota = DB::table('tempat_agen')
-            ->join('kota', 'tempat_agen.kota_id', '=', 'kota.id')
+            ->join('kota','kota.id', '=', 'tempat_agen.kota_id')
             ->where('tempat_agen.id', '=', $id)
             ->select('tempat_agen.id', 'tempat_agen.kota_id', 'kota.nama_kota', 'tempat_agen.tempat_agen')
             ->get();
@@ -667,5 +662,52 @@ where p.order_id = '$order_id'");
                         'data' => $tracking
                     ], Response::HTTP_OK);
                 }
+    }
+
+    public function cek_ketersediaan(Request $request)
+    {
+        $carId = $request->input('id_mobil');
+        $seatNumber = $request->input('no_kursi');
+
+        $car = Shuttle::find($carId);
+
+        if (!$car) {
+            return response()->json(['error' => 'Mobil tidak ditemukan.'], 404);
+        }
+
+        $seat = Kursi::where('id_mobil', $carId)->where('no_kursi', $seatNumber)->first();
+
+        if ($seat && $seat->is_booked) {
+            return response()->json(['error' => 'Tempat duduk telah dipesan.'], 400);
+        }
+
+        return response()->json(['message' => 'Tempat duduk tersedia.'], 200);
+    }
+
+    public function booked_seat(Request $request)
+    {
+        $carId = $request->input('id_mobil');
+        $seatNumber = $request->input('no_kursi');
+
+        $car = Shuttle::find($carId);
+
+        if (!$car) {
+            return response()->json(['error' => 'Mobil tidak ditemukan.'], 404);
+        }
+
+        $seat = Kursi::where('id_mobil', $carId)->where('no_kursi', $seatNumber)->first();
+
+        if (!$seat) {
+            return response()->json(['error' => 'Tempat duduk tidak ditemukan.'], 404);
+        }
+
+        if ($seat->is_booked) {
+            return response()->json(['error' => 'Tempat duduk telah dipesan.'], 400);
+        }
+
+        $seat->is_booked = true;
+        $seat->save();
+
+        return response()->json(['message' => 'Tempat duduk berhasil dipesan.'], 200);
     }
 }

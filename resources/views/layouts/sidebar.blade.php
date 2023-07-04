@@ -22,8 +22,8 @@
 					</a>
 					<ul class="sub-menu" aria-expanded="false">
 						<li><a href="{{ route('pemesanan') }}" key="t-saas">Pemesanan</a></li>
-						<li><a href="{{ route('persediaan_tiket') }}" key="t-saas">Persediaan</a></li>
-						<li><a href="{{ route('shuttle.index') }}" key="t-crypto">Shuttle</a></li>
+						<li><a href="{{ route('persediaan_tiket') }}" key="t-saas">Jadwal Keberangkatan</a></li>
+						<li><a href="{{ route('shuttle.index') }}" key="t-crypto">Armada</a></li>
 						<li><a href="{{ route('tracking') }}" key="t-crypto">Tracking</a></li>
 						<li><a href="{{ route('agen.index') }}" key="t-blog">Tempat Agen</a></li>
 						<li><a href="{{ route('kota') }}" key="t-blog">Kota</a></li>

@@ -26,11 +26,10 @@
                                     <div class="col-lg">
                                         <div class="mb-3  mt-3 mt-lg-0">
                                             <label for="nama_kota">kota</label>
-										    <select class="form-control" id="nama_kota" name="nama_kota" required>
+										    <select class="form-control" id="kota_id" name="kota_id" required>
 											<option value="">Pilih kota</option>
 											@foreach ($kota as $kt)
-												<option <?= $kt['nama_kota'] ? 'selected' : '' ?> value="{{ $kt['id'] }}">
-													{{ $kt['nama_kota'] }}</option>
+												<option value="{{ $kt['id'] }}"> {{ $kt['nama_kota'] }}</option>
 											@endforeach
 										</select>
                                         </div>
