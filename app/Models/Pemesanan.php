@@ -17,6 +17,12 @@ class Pemesanan extends Model
         'email',
         'no_hp',
         'alamat',
-        'nama_penumpang'
+        'nama_penumpang',
+        'no_kursi'
     ];
+
+    public function seat()
+    {
+        return $this->belongsTo(Kursi::class);
+    }
 }

@@ -664,50 +664,58 @@ where p.order_id = '$order_id'");
                 }
     }
 
-    public function cek_ketersediaan(Request $request)
+
+    public function reservasi_seat(Request $request)
     {
-        $carId = $request->input('id_mobil');
-        $seatNumber = $request->input('no_kursi');
+        $nomer_seat = $request->input('no_kursi');
 
-        $car = Shuttle::find($carId);
-
-        if (!$car) {
-            return response()->json(['error' => 'Mobil tidak ditemukan.'], 404);
+    
+        $getSeat = Kursi::where('no_kursi', $nomer_seat)->first();
+        if ($getSeat) {
+            return response()->json(['message' => 'Kursi sudah dipesan'], 400);
         }
 
-        $seat = Kursi::where('id_mobil', $carId)->where('no_kursi', $seatNumber)->first();
+    
+        $shuttle = Shuttle::first(); 
+        if (!$shuttle) {
+            return response()->json(['message' => 'Shuttle tidak ditemukan'], 404);
+        }
+        $maxSeatCount = $shuttle->kapasitas;
 
-        if ($seat && $seat->is_booked) {
-            return response()->json(['error' => 'Tempat duduk telah dipesan.'], 400);
+        $availableSeatsCount = Kursi::count();
+        if ($availableSeatsCount >= $maxSeatCount) {
+            return response()->json(['message' => 'Tidak ada kursi yang tersedia'], 400);
         }
 
-        return response()->json(['message' => 'Tempat duduk tersedia.'], 200);
-    }
-
-    public function booked_seat(Request $request)
-    {
-        $carId = $request->input('id_mobil');
-        $seatNumber = $request->input('no_kursi');
-
-        $car = Shuttle::find($carId);
-
-        if (!$car) {
-            return response()->json(['error' => 'Mobil tidak ditemukan.'], 404);
-        }
-
-        $seat = Kursi::where('id_mobil', $carId)->where('no_kursi', $seatNumber)->first();
-
-        if (!$seat) {
-            return response()->json(['error' => 'Tempat duduk tidak ditemukan.'], 404);
-        }
-
-        if ($seat->is_booked) {
-            return response()->json(['error' => 'Tempat duduk telah dipesan.'], 400);
-        }
-
-        $seat->is_booked = true;
+        
+        $seat = new Kursi();
+        $seat->no_kursi = $nomer_seat;
         $seat->save();
 
-        return response()->json(['message' => 'Tempat duduk berhasil dipesan.'], 200);
+    
+        $pemesanan = new Pemesanan();
+        $pemesanan->no_kursi = $seat->id;
+        $pemesanan->save();
+
+        return response()->json(['message' => 'Kursi berhasil dipesan'], 200);
     }
+
+    public function get_ketersediaan_seat()
+    {
+
+        $seats = DB::table('kursi')
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('pemesanan')
+                    ->whereRaw('pemesanan.no_kursi = kursi.no_kursi');
+            })
+            ->get();
+        
+
+        return response()
+            ->json([
+                'seats' => $seats
+            ], 200);
+    }
+
 }

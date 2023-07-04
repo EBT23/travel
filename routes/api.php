@@ -91,6 +91,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/tracking_by_id_supir/{id}', [ApiAllController::class, 'tracking_by_id_supir']);
     Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
 
-    Route::post('/cek_ketersediaan', [ApiAllController::class, 'cek_ketersediaan']);
-    Route::post('/booked_seat', [ApiAllController::class, 'booked_seat']);
+    //Seat
+    Route::post('/reservasi_seat', [ApiAllController::class, 'reservasi_seat']);
+    Route::get('/get_ketersediaan_seat', [ApiAllController::class, 'get_ketersediaan_seat']);
 });
