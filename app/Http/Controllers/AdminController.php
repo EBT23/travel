@@ -29,18 +29,7 @@ class AdminController extends Controller
         $belumBayar = Pemesanan::where('status', 'belum bayar')->distinct('id')->count();
         $lunas = Pemesanan::where('status', 'lunas')->distinct('id')->count();
 
-        //chart
-    //     $data = Pemesanan::where('status', 'lunas')
-    //     ->join('persediaan_tiket', 'pemesanan.id_persediaan_tiket', '=', 'persediaan_tiket.id')
-    //     ->selectRaw('YEAR(pemesanan.created_at) as year, AVG(persediaan_tiket.harga) as average')
-    //     ->groupBy('year')
-    //     ->get();
-
-    //     $labels = $data->pluck('year');
-
-    //     $averages = $data->pluck('average');
-
-        return view('Admin.dashboard',compact('jumlahPemesan', 'belumBayar','lunas','totalPemasukan', 'data'));
+        return view('admin.dashboard',compact('jumlahPemesan', 'belumBayar','lunas','totalPemasukan', 'data'));
     }
 
 
@@ -55,7 +44,7 @@ class AdminController extends Controller
         ->where('users.role_id','=','3')
         ->get();
         
-        return view('Admin.supir',['supir' => $supir], $data);
+        return view('admin.supir',['supir' => $supir], $data);
     }
 
     public function tambah_supir(Request $request)
@@ -149,7 +138,7 @@ class AdminController extends Controller
         $data['title'] = 'Kelola Roles';
         $roles = DB::table('roles')->get();
 
-        return view('Admin.roles',['roles' => $roles], $data);
+        return view('admin.roles',['roles' => $roles], $data);
     }
 
     public function tambah_roles(Request $request)
@@ -242,7 +231,7 @@ class AdminController extends Controller
         $kota = $response->getBody();
         $data['nama_kota'] = json_decode($kota, true);
         $data['nama_kota'] = $data['nama_kota']['data'];
-        return view('Admin.kota', $data);
+        return view('admin.kota', $data);
     }
 
     public function tambah_kota(Request $request)
@@ -316,7 +305,7 @@ class AdminController extends Controller
     $data['kota'] = json_decode($response->getBody(), true);
     $data['kota'] = $data['kota']['data'][0];
    
-    return view('Admin.editKota', $data);
+    return view('admin.editKota', $data);
     }
 
     public function hapus_kota($id)
@@ -357,7 +346,7 @@ class AdminController extends Controller
         $agen = $response->getBody();
         $data['tempat_agen'] = json_decode($agen, true);
         $data['tempat_agen'] = $data['tempat_agen']['data'];
-        return view('Admin.agen', $data, $get_kota);
+        return view('admin.agen', $data, $get_kota);
     }
 
     public function tambah_agen(Request $request)
@@ -411,7 +400,7 @@ class AdminController extends Controller
         $tempat_agen  = TempatAgen::find($id);
         $kota = DB::table('kota')->get();
    
-        return view('Admin.edit_agen',compact('tempat_agen','kota'), $data);
+        return view('admin.edit_agen',compact('tempat_agen','kota'), $data);
     }
 
     public function hapus_tempat_agen($id)
@@ -454,7 +443,7 @@ class AdminController extends Controller
         $shuttle = $response->getBody();
         $data['shuttle'] = json_decode($shuttle, true);
         $data['shuttle'] = $data['shuttle']['data'];
-        return view('Admin.shuttle', $data);
+        return view('admin.shuttle', $data);
     }
 
     public function tambah_shuttle(Request $request)
@@ -532,7 +521,7 @@ class AdminController extends Controller
         $data['shuttle'] = json_decode($response->getBody(), true);
         $data['shuttle'] = $data['shuttle']['data'][0];
    
-        return view('Admin.edit_shuttle', $data);
+        return view('admin.edit_shuttle', $data);
     }
 
     public function hapus_shuttle($id)
@@ -576,7 +565,7 @@ class AdminController extends Controller
         $data['shuttle'] = json_decode($body_shuttle, true);
         $data['shuttle'] = $data['shuttle']['data'];
 
-        return view('Admin.persediaan_tiket', $data);
+        return view('admin.persediaan_tiket', $data);
     }
     public function tambah_persediaan_tiket(Request $request)
     {
@@ -668,7 +657,7 @@ class AdminController extends Controller
         $data['shuttle'] = $data['shuttle']['data'];
 
 
-        return view('Admin.form_persediaan', $data);
+        return view('admin.form_persediaan', $data);
     }
     public function delete_persediaan_tiket($id)
     {
@@ -716,6 +705,6 @@ class AdminController extends Controller
             ->select('pemesanan.*','persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.harga','t.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan')
             ->get();
         
-        return view('Admin.pemesanan', compact('pemesanan'));
+        return view('admin.pemesanan', compact('pemesanan'));
     }
 }

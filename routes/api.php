@@ -92,7 +92,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/get_tempat_agen/{id}', [ApiAllController::class, 'get_tempat_agen']);
     
      //Seat
-    Route::post('/reservasi_seat', [ApiAllController::class, 'reservasi_seat']);
+    Route::get('/showAllseat', [ApiAllController::class, 'tampilkanSeat']);
+    Route::get('/getjenisMobil/{mobil}', [ApiAllController::class, 'getKapasitasKursiByJenisMobil']);
+    Route::post('/pilihSeat', [ApiAllController::class, 'pilihSeat']);
     Route::get('/get_ketersediaan_seat', [ApiAllController::class, 'get_ketersediaan_seat']);
 
 });

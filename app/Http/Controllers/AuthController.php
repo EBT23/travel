@@ -11,7 +11,7 @@ class AuthController extends Controller
 	public function login()
 	{
 		$data['title'] = 'Login';
-		return view('Auth.login', $data);
+		return view('auth.login', $data);
 	}
 	public function aksi_login(Request $request)
 	{
@@ -40,7 +40,7 @@ class AuthController extends Controller
 	public function register()
 	{
 		$data['title'] = 'Register';
-		return view('Auth.register', $data);
+		return view('auth.register', $data);
 	}
 	public function logout()
 	{
@@ -52,6 +52,6 @@ class AuthController extends Controller
         $body_logout = $response->getBody();
         $data['logout'] = json_decode($body_logout, true);
         return redirect()->route('login');
-       
+    
 	}
 }

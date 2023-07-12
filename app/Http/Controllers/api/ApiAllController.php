@@ -13,6 +13,7 @@ use App\Models\Persediaan_tiket;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Kursi;
+use Exception;
 use Illuminate\Foundation\Auth\User;
 
 class ApiAllController extends Controller
@@ -662,59 +663,117 @@ where p.order_id = '$order_id'");
                     ], Response::HTTP_OK);
                 }
     }
-    
-     public function reservasi_seat(Request $request)
+
+    public function tampilkanSeat()
+    {
+
+         // Mengambil semua jenis mobil
+        $jenis_mobil = Shuttle::pluck('jenis_mobil')->all();
+
+        // Membuat array kosong untuk menyimpan kapasitas kursi berdasarkan jenis mobil
+        $kapasitasByJenisMobil = [];
+
+        // Loop melalui setiap jenis mobil
+        foreach ($jenis_mobil as $jenis) {
+            // Mengambil kapasitas kursi untuk jenis mobil tertentu
+            $kapasitas = Shuttle::where('jenis_mobil', $jenis)->value('kapasitas');
+
+            // Menyimpan kapasitas kursi dalam array berdasarkan jenis mobil
+            $kapasitasByJenisMobil[$jenis] = $kapasitas;
+        }
+
+        return response()->json(['kapasitas_by_jenis_mobil' => $kapasitasByJenisMobil]);
+
+    }
+
+    public function getKapasitasKursiByJenisMobil($mobil)
+    {
+        // Mengambil kapasitas kursi tersedia untuk jenis mobil tertentu
+        $kapasitasTersedia = Shuttle::where('jenis_mobil', $mobil)
+                                    ->pluck('kapasitas')
+                                    ->first();
+
+        // Membuat array kosong untuk menyimpan nomor kursi
+        $nomorKursi = [];
+
+        // Menambahkan nomor kursi sesuai dengan kapasitas yang tersedia
+        for ($i = 1; $i <= $kapasitasTersedia; $i++) {
+            $nomorKursi[] = $i;
+        }
+
+        return response()->json(['nomor_kursi_tersedia' => $nomorKursi]);
+    }
+        
+     public function pilihSeat(Request $request)
     {
         $nomer_seat = $request->input('no_kursi');
-
+        $jenis_mobil = $request->input('jenis_mobil');
     
-        $getSeat = Kursi::where('no_kursi', $nomer_seat)->first();
+        // Cek apakah kursi sudah dipesan sebelumnya untuk jenis mobil tertentu
+        $getSeat = Kursi::where('no_kursi', $nomer_seat)->where('jenis_mobil', $jenis_mobil)->first();
         if ($getSeat) {
             return response()->json(['message' => 'Kursi sudah dipesan'], 400);
         }
-
     
-        $shuttle = Shuttle::first(); 
-        if (!$shuttle) {
-            return response()->json(['message' => 'Shuttle tidak ditemukan'], 404);
+        // Cek apakah semua kursi sudah dipesan untuk jenis mobil tertentu
+        $kapasitas = Shuttle::where('jenis_mobil', $jenis_mobil)->value('kapasitas');
+        if (!$kapasitas) {
+            return response()->json(['message' => 'Jenis mobil tidak ditemukan'], 404);
         }
-        $maxSeatCount = $shuttle->kapasitas;
-
-        $availableSeatsCount = Kursi::count();
-        if ($availableSeatsCount >= $maxSeatCount) {
-            return response()->json(['message' => 'Tidak ada kursi yang tersedia'], 400);
-        }
-
-        
-        $seat = new Kursi();
-        $seat->no_kursi = $nomer_seat;
-        $seat->save();
-
     
-        $pemesanan = new Pemesanan();
-        $pemesanan->no_kursi = $seat->id;
-        $pemesanan->save();
+        $bookedSeatsCount = Kursi::where('no_kursi', $nomer_seat)->count();
+        if ($bookedSeatsCount >= $kapasitas) {
+            return response()->json(['message' => 'Tidak ada kursi yang tersedia untuk nomor kursi ini'], 400);
+        }
 
-        return response()->json(['message' => 'Kursi berhasil dipesan'], 200);
+        try {
+            DB::beginTransaction();
+
+            // Tambahkan kursi baru
+            $seat = new Kursi();
+            $seat->no_kursi = $nomer_seat;
+            $seat->jenis_mobil = $jenis_mobil;
+            $seat->save();
+
+            // Tandai kursi sebagai terpesan
+            // $pemesanan = new Pemesanan();
+            // $pemesanan->no_kursi = $seat->id;
+            // $pemesanan->save();
+
+            // Mengurangi kapasitas kursi
+            Shuttle::where('jenis_mobil', $jenis_mobil)->decrement('kapasitas');
+
+            DB::commit();
+
+            return response()->json(['message' => 'Kursi berhasil dipilih'], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Terjadi kesalahan dalam memilih kursi'], 500);
+        }
+
     }
 
-    public function get_ketersediaan_seat()
-    {
+   
 
-        $seats = DB::table('kursi')
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('pemesanan')
-                    ->whereRaw('pemesanan.no_kursi = kursi.no_kursi');
-            })
-            ->get();
+    
+
+    // public function get_ketersediaan_seat()
+    // {
+
+    //     $seats = DB::table('kursi')
+    //         ->whereNotExists(function ($query) {
+    //             $query->select(DB::raw(1))
+    //                 ->from('pemesanan')
+    //                 ->whereRaw('pemesanan.id_persediaan_tiket = kursi.no_kursi');
+    //         })
+    //         ->get();
         
 
-        return response()
-            ->json([
-                'seats' => $seats
-            ], 200);
-    }
+    //     return response()
+    //         ->json([
+    //             'seats' => $seats
+    //         ], 200);
+    // }
 
 
 }
