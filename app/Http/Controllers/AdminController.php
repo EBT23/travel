@@ -34,7 +34,7 @@ class AdminController extends Controller
         $belumBayar = Pemesanan::where('status', 'belum bayar')->distinct('id')->count();
         $lunas = Pemesanan::where('status', 'lunas')->distinct('id')->count();
 
-        return view('admin.dashboard',compact('jumlahPemesan', 'belumBayar','lunas', 'data'));
+        return view('admin.dashboard',compact('jumlahPemesan','totalPemasukan', 'belumBayar','lunas', 'data'));
     }
 
 
