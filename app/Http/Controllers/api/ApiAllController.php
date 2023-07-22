@@ -18,161 +18,6 @@ use Illuminate\Foundation\Auth\User;
 
 class ApiAllController extends Controller
 {
-    public function role()
-    {
-        $role = Role::all();
-        return response()->json([
-            'data' => $role
-        ]);
-    }
-    public function tambah_role(Request $request)
-    {
-        // validasi input
-        $validated = $request->validate([
-            'roles' => 'required',
-        ]);
-
-        // simpan data ke database
-        $data = new Role;
-        $data->roles = $validated['roles'];
-        $data->save();
-
-        // kirim response
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data berhasil disimpan'
-        ]);
-    }
-    public function update_role(Request $request, $id)
-    {
-        $role = Role::findOrFail($id);
-        $role->update($request->all());
-        return response()->json($role, 200);
-    }
-    public function delete_role($id)
-    {
-        $role = Role::findOrFail($id);
-        $role->delete();
-        return response()->json(null, 204);
-    }
-    public function shuttle()
-    {   
-        $shuttle = DB::table('shuttle')->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $shuttle
-        ]);
-    }
-    public function tambah_shuttle(Request $request)
-    {
-        // validasi input
-         $validated = $request->validate([
-            'jenis_mobil' => 'required',
-            'kapasitas' => 'required',
-            'fasilitas' => 'required',
-        ]);
-
-        // simpan data ke database
-        $data = new Shuttle;
-        $data->jenis_mobil = $validated['jenis_mobil'];
-        $data->kapasitas = $validated['kapasitas'];
-        $data->fasilitas = $validated['fasilitas'];
-        $data->save();
-
-        // kirim response
-        return response()->json([
-            'success' => true,
-            'message' => 'Armada berhasil dibuat',
-            'data' => $data
-        ], Response::HTTP_OK);
-    }
-
-    public function update_shuttle(Request $request, $id)
-    {
-        $shuttle = Shuttle::findOrFail($id);
-        $shuttle->update($request->all());
-        return response()->json([
-            'success' => true,
-            'message' => 'Armada berhasil dirubah',
-            'data' => $shuttle
-        ]);
-    }
-    public function delete_shuttle($id)
-    {
-        $shuttle = Shuttle::findOrFail($id);
-        $shuttle->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Armada berhasil dihapus',
-            'data' => $shuttle
-        ]);
-    }
-    public function persediaan_tiket()
-    {
-       $persediaan_tiket = DB::table('persediaan_tiket')
-            ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
-            ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
-            ->join('shuttle','shuttle.id','=','persediaan_tiket.id_shuttle')
-            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.tgl_keberangkatan', 
-            'persediaan_tiket.kuota', 'persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 
-            'tempat_agen.tempat_agen AS tujuan','shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
-            ->get();
-            
-        return response()->json([
-            'success' => true,
-            'message' => 'Data berhasil ditampilkan',
-            'data' => $persediaan_tiket
-        ]);
-    }
-    public function tambah_persediaan_tiket(Request $request)
-    {
-        $validated = $request->validate([
-            'tgl_keberangkatan' => 'required',
-            'asal' => 'required',
-            'tujuan' => 'required',
-            'kuota' => 'required',
-            'id_shuttle' => 'required',
-            'estimasi_perjalanan' => 'required',
-            'harga' => 'required',
-        ]);
-
-        $persediaan_tiket = DB::table('persediaan_tiket')->insert([
-            'tgl_keberangkatan' => $request->tgl_keberangkatan,
-            'asal' => $request->asal,
-            'tujuan' => $request->tujuan,
-            'kuota' => $request->kuota,
-            'id_shuttle' => $request->id_shuttle,
-            'estimasi_perjalanan' => $request->estimasi_perjalanan,
-            'harga' => $request->harga,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Persediaan tiket berhasil dibuat',
-            'data' => $persediaan_tiket
-        ], Response::HTTP_OK);
-    }
-    public function update_persediaan_tiket(Request $request, $id)
-    {
-        $persediaan_tiket = Persediaan_tiket::findOrFail($id);
-        $persediaan_tiket->update($request->all());
-        return response()->json([
-            'success' => true,
-            'message' => 'Persediaan tiket berhasil dirubah',
-            'data' => $persediaan_tiket
-        ]);
-    }
-    public function delete_persediaan_tiket($id)
-    {
-        $persediaan_tiket = Persediaan_tiket::findOrFail($id);
-        $persediaan_tiket->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Persediaan tiket berhasil dihapus',
-            'data' => $persediaan_tiket
-        ]);
-    }
     // Supir
     public function supir()
     {
@@ -247,102 +92,16 @@ class ApiAllController extends Controller
         return response()->json(null, 204);
     }
 
-    // KOTA
-    public function kota()
+
+
+    // RUTE
+    public function rute()
     {
-        $kota = Kota::all();
+        $rute = DB::table('rute')->get();
+        
         return response()->json([
-            'data' => $kota
+            'data' => $rute,
         ]);
-    }
-
-    public function tambah_kota(Request $request)
-    {
-        $validated = $request->validate([
-            'nama_kota' => 'required',
-        ]);
-
-        // simpan data ke database
-        $data = new Kota;
-        $data->nama_kota = $validated['nama_kota'];
-        $data->save();
-
-        // kirim response
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data berhasil ditambah'
-        ]);
-    }
-
-    public function update_kota(Request $request, $id)
-    {
-        $kota = Kota::findOrFail($id);
-        $kota->update($request->all());
-        return response()->json([
-            'success' => true,
-            'message' => 'kota berhasil diupdate',
-            'data' => $kota, 200
-        ]);
-    }
-
-    public function delete_kota($id)
-    {
-        $kota = Kota::findOrFail($id);
-        $kota->delete();
-        return response()->json(null, 204);
-    }
-
-    // TEMPAT AGEN
-
-    public function tempat_agen()
-    {
-        $kota = Kota::all();
-        $tmagen = DB::table('tempat_agen')
-            ->join('kota', 'kota.id', '=', 'tempat_agen.kota_id')
-            ->select('tempat_agen.id', 'tempat_agen.kota_id','kota.nama_kota', 'tempat_agen.tempat_agen')
-            ->get();
-        return response()->json([
-            'data' => $tmagen,
-            'kota' => $kota
-        ]);
-    }
-
-    public function tambah_tempat_agen(Request $request)
-    {
-        $validated = $request->validate([
-            'kota_id' => 'required',
-            'tempat_agen' => 'required',
-        ]);
-
-        // simpan data ke database
-        $data = new TempatAgen();
-        $data->kota_id = $validated['kota_id'];
-        $data->tempat_agen = $validated['tempat_agen'];
-        $data->save();
-
-        // kirim response
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data berhasil ditambah'
-        ]);
-    }
-
-    public function update_tempat_agen(Request $request, $id)
-    {
-        $tmagen = TempatAgen::findOrFail($id);
-        $tmagen->update($request->all());
-        return response()->json([
-            'success' => true,
-            'message' => 'kota berhasil diupdate',
-            'data' => $tmagen, 200
-        ]);
-    }
-
-    public function delete_tempat_agen($id)
-    {
-        $tmagen = TempatAgen::findOrFail($id);
-        $tmagen->delete();
-        return response()->json(null, 204);
     }
 
     public function pemesanan()
@@ -356,7 +115,7 @@ class ApiAllController extends Controller
     public function tambah_pemesanan(Request $request)
     {
         $validated = $request->validate([
-            'id_persediaan_tiket' => 'required',
+            'id_jadwal' => 'required',
             'nama_pemesan' => 'required',
             'email' => 'required',
             'no_hp' => 'required',
@@ -735,12 +494,6 @@ where p.order_id = '$order_id'");
             $seat->jenis_mobil = $jenis_mobil;
             $seat->save();
 
-            // Tandai kursi sebagai terpesan
-            // $pemesanan = new Pemesanan();
-            // $pemesanan->no_kursi = $seat->id;
-            // $pemesanan->save();
-
-            // Mengurangi kapasitas kursi
             Shuttle::where('jenis_mobil', $jenis_mobil)->decrement('kapasitas');
 
             DB::commit();
@@ -752,28 +505,6 @@ where p.order_id = '$order_id'");
         }
 
     }
-
-   
-
-    
-
-    // public function get_ketersediaan_seat()
-    // {
-
-    //     $seats = DB::table('kursi')
-    //         ->whereNotExists(function ($query) {
-    //             $query->select(DB::raw(1))
-    //                 ->from('pemesanan')
-    //                 ->whereRaw('pemesanan.id_persediaan_tiket = kursi.no_kursi');
-    //         })
-    //         ->get();
-        
-
-    //     return response()
-    //         ->json([
-    //             'seats' => $seats
-    //         ], 200);
-    // }
 
 
 }
