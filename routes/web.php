@@ -33,17 +33,29 @@ Route::post('/tambah_roles',[AdminController::class,'tambah_roles'])->name('tamb
 Route::post('/edit_roles/{id}',[AdminController::class,'edit_roles'])->name('edit.roles');
 Route::post('/hapus_roles/{id}',[AdminController::class,'hapus_roles'])->name('hapus.roles');
 
-Route::get('/agen', [AdminController::class, 'agen'])->name('agen.index');
-Route::post('/tambah_agen', [AdminController::class, 'tambah_agen'])->name('tambah.agen');
-Route::post('/update_agen/{id}', [AdminController::class, 'update_agen'])->name('update.agen');
-Route::get('/edit_agen/{id}', [AdminController::class, 'edit_agen'])->name('edit.agen');
-Route::delete('/delete_tempat_agen/{id}', [AdminController::class, 'hapus_tempat_agen'])->name('delete.tempat.agen');
+Route::get('/rute', [AdminController::class, 'rute'])->name('rute');
+Route::post('/tambah_rute', [AdminController::class, 'tambah_rute'])->name('tambah.rute');
+Route::post('/update_rute/{id}', [AdminController::class, 'update_rute'])->name('update.rute');
+Route::get('/edit_rute/{id}', [AdminController::class, 'edit_rute'])->name('edit.rute');
+Route::delete('/delete_rute/{id}', [AdminController::class, 'delete_rute'])->name('delete.rute');
 
-Route::get('/shuttle', [AdminController::class, 'shuttle'])->name('shuttle.index');
-Route::post('/tambah_shuttle', [AdminController::class, 'tambah_shuttle'])->name('tambah.shuttle');
-Route::post('/update_shuttle/{id}', [AdminController::class, 'update_shuttle'])->name('update.shuttle');
-Route::get('/edit_shuttle/{id}', [AdminController::class, 'edit_shuttle'])->name('edit.shuttle');
-Route::delete('/delete_shuttle/{id}', [AdminController::class, 'hapus_shuttle'])->name('delete.shuttle');
+Route::get('/armada', [AdminController::class, 'armada'])->name('armada');
+Route::post('/tambah_armada', [AdminController::class, 'tambah_armada'])->name('tambah.armada');
+Route::post('/update_armada/{id}', [AdminController::class, 'update_armada'])->name('update.armada');
+Route::get('/edit_armada/{id}', [AdminController::class, 'edit_armada'])->name('edit.armada');
+Route::delete('/delete_armada/{id}', [AdminController::class, 'hapus_armada'])->name('delete.armada');
+
+Route::get('/fasilitas', [AdminController::class, 'fasilitas'])->name('fasilitas');
+Route::post('/tambah_fasilitas', [AdminController::class, 'tambah_fasilitas'])->name('tambah.fasilitas');
+Route::post('/update_fasilitas/{id}', [AdminController::class, 'update_fasilitas'])->name('update.fasilitas');
+Route::get('/edit_fasilitas/{id}', [AdminController::class, 'edit_fasilitas'])->name('edit.fasilitas');
+Route::delete('/delete_fasilitas/{id}', [AdminController::class, 'hapus_fasilitas'])->name('delete.fasilitas');
+
+Route::get('/detail_fasilitas', [AdminController::class, 'detail_fasilitas'])->name('detail_fasilitas');
+Route::post('/tambah_detail_fasilitas', [AdminController::class, 'tambah_detail_fasilitas'])->name('tambah.detail.fasilitas');
+Route::post('/update_detail_fasilitas/{id}', [AdminController::class, 'update_detail_fasilitas'])->name('update.detail.fasilitas');
+Route::get('/edit_detail_fasilitas/{id}', [AdminController::class, 'edit_detail_fasilitas'])->name('edit.detail.fasilitas');
+Route::delete('/delete_detail_fasilitas/{id}', [AdminController::class, 'hapus_detail_fasilitas'])->name('delete.detail.fasilitas');
 
 Route::get('/tracking', [AdminController::class, 'tracking'])->name('tracking');
 
@@ -60,11 +72,11 @@ Route::delete('/delete_kota/{id}', [AdminController::class, 'hapus_kota'])->name
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/persediaan_tiket', [AdminController::class, 'persediaan_tiket'])->name('persediaan_tiket');
-Route::post('/tambah_persediaan_tiket', [AdminController::class, 'tambah_persediaan_tiket'])->name('tambah.persediaan.tiket');
-Route::post('/update_persediaan_tiket/{id}', [AdminController::class, 'update_persediaan_tiket'])->name('update.persediaan.tiket');
-Route::get('/form_edit_persediaan/{id}', [AdminController::class, 'form_edit_persediaan'])->name('form.edit.persediaan');
-Route::delete('/delete_persediaan_tiket/{id}', [AdminController::class, 'delete_persediaan_tiket'])->name('delete.persediaan.tiket');
+Route::get('/jadwal', [AdminController::class, 'jadwal'])->name('jadwal');
+Route::post('/tambah_jadwal', [AdminController::class, 'tambah_jadwal'])->name('tambah.jadwal');
+Route::post('/update_jadwal/{id}', [AdminController::class, 'update_jadwal'])->name('update.jadwal');
+Route::get('/edit_jadwal/{id}', [AdminController::class, 'edit_jadwal'])->name('edit.jadwal');
+Route::delete('/delete_jadwal/{id}', [AdminController::class, 'delete_jadwal'])->name('delete.jadwal');
 
 Route::get('/pemesanan',[AdminController::class, 'pemesanan'])->name('pemesanan');
 

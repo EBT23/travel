@@ -25,7 +25,7 @@
                                     <tr>
                                         <th width="5%">No</th>
                                         <th class="text-center">Tanggal Keberangkatan</th>
-                                        <th class="text-center">Asal</th>
+                                        <th class="text-center">Keberangkatan</th>
                                         <th class="text-center">Tujuan</th>
                                         <th class="text-center">Nama Pemesan</th>
                                         <th class="text-center">No HP</th>
@@ -40,7 +40,7 @@
                                         <tr>
                                             <td>{{ $no++ }}</td>
                                             <td class="text-center">{{ date('d-m-Y', strtotime($pt->tgl_keberangkatan)) }}</td>
-                                            <td>{{ $pt->asal }}</td>
+                                            <td>{{ $pt->keberangkatan }}</td>
                                             <td>{{ $pt->tujuan }}</td>
                                             <td>{{ $pt->nama_pemesan }}</td>
                                             <td>{{ $pt->no_hp }}</td>

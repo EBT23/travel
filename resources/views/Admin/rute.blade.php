@@ -19,32 +19,35 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body col-lg">
-                            <h4 class="card-title">FORM TAMBAH DATA AGEN</h4>
-                            <form action="{{ route('tambah.agen') }}" method="POST" enctype="multipart/form-data">
+                            <h4 class="card-title">FORM TAMBAH DATA RUTE</h4>
+                            <form action="{{ route('tambah.rute') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row">
                                     <div class="col-lg">
                                         <div class="mb-3  mt-3 mt-lg-0">
-                                            <label for="nama_kota">kota</label>
-										    <select class="form-control" id="kota_id" name="kota_id" required>
-											<option value="">Pilih kota</option>
-											@foreach ($kota as $kt)
-												<option value="{{ $kt['id'] }}"> {{ $kt['nama_kota'] }}</option>
-											@endforeach
-										</select>
+                                            <label class="form-label" for="keberangkatan">Keberangkatan</label>
+                                            <input type="text" class="form-control" name="keberangkatan" id="keberangkatan">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg">
                                         <div class="mb-3  mt-3 mt-lg-0">
-                                            <label class="form-label" for="tempat_agen">Masukkan Data</label>
-                                            <input class="form-control" name="tempat_agen" id="tempat_agen">
+                                            <label class="form-label" for="tujuan">Tujuan</label>
+                                            <input type="text" class="form-control" name="tujuan" id="tujuan">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg">
+                                        <div class="mb-3  mt-3 mt-lg-0">
+                                            <label class="form-label" for="waktu">Waktu</label>
+                                            <input type="time" class="form-control" name="waktu" id="waktu">
                                         </div>
                                     </div>
                                 </div>
                                 <div>
-                                    <button type="submit" class="btn btn-success w-md">Tambah Agen</i></button>
+                                    <button type="submit" class="btn btn-success w-md">Tambah Rute</i></button>
                                 </div>
                             </form>
                         </div>
@@ -55,29 +58,31 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title my-2">Data Agen</h4>
+                            <h4 class="card-title my-2">Data Rute</h4>
                             <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100 text-center">
                                 <thead>
                                     <tr>
                                         <th width="5%">No</th>
-                                        <th>Nama Kota</th>
-                                        <th>Lokasi Agen</th>
+                                        <th>Keberangkatan</th>
+                                        <th>Tujuan</th>
+                                        <th>Waktu Keberangkatan</th>
                                         <th width="15%">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($tempat_agen as $index => $ta)
+                                    @foreach ($getRute as $index => $ta)
                                     <tr>
                                         <td>{{ $index+1 }}</td>
-                                        <td>{{ $ta['nama_kota'] }}</td>
-                                        <td>{{ $ta['tempat_agen'] }}</td>
+                                        <td>{{ $ta['keberangkatan'] }}</td>
+                                        <td>{{ $ta['tujuan'] }}</td>
+                                        <td>Pukul {{ $ta['waktu'] }} WIB</td>
                                         <td>
                                             <div class="d-flex flex-wrap gap-4">
-                                                <a href="{{ route('edit.agen', ['id' => $ta['id']]) }}" type="button"
+                                                <a href="{{ route('edit.rute', ['id' => $ta['id']]) }}" type="button"
                                                     class="btn btn-soft-primary waves-effect waves-light">
                                                    <i class="dripicons-document-edit"></i></a>
 
-                                                   <form action="{{ route('delete.tempat.agen', ['id' => $ta['id']]) }}" method="POST">
+                                                   <form action="{{ route('delete.rute', ['id' => $ta['id']]) }}" method="POST">
                                                     {{ csrf_field() }}
                                                     {{ method_field('DELETE') }}
                                                     <button onclick="return confirm('Anda yakin akan menghapus ini? ')" type="submit"

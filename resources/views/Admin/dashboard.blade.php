@@ -14,7 +14,7 @@
                             <div class="d-flex">
                                 <div class="flex-grow-1">
                                     <p class="text-muted fw-medium">Total Pemasukan</p>
-                                    <h4 class="mb-0">Rp. {{ number_format($totalPemasukan) }}</h4>
+                                    {{-- <h4 class="mb-0">Rp. {{ number_format($totalPemasukan) }}</h4> --}}
                                 </div>
 
                                 <div class="flex-shrink-0 align-self-center">

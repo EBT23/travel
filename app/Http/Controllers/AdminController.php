@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DetailFasilitas;
+use App\Models\Fasilitas;
+use App\Models\Jadwal;
 use App\Models\Pemesanan;
 use App\Models\Persediaan_tiket;
 use App\Models\Role;
+use App\Models\Rute;
+use App\Models\Shuttle;
 use App\Models\TempatAgen;
 use App\Models\User;
 use Carbon\Carbon;
@@ -22,14 +27,14 @@ class AdminController extends Controller
         $data['title'] = 'Dashboard';
 
         $totalPemasukan = Pemesanan::where('status', 'lunas')
-          ->join('persediaan_tiket', 'pemesanan.id_persediaan_tiket', '=', 'persediaan_tiket.id')
-          ->sum('persediaan_tiket.harga');
+            ->join('jadwal_keberangkatan', 'pemesanan.id_jadwal', '=', 'jadwal_keberangkatan.id')
+            ->sum('jadwal_keberangkatan.harga');
 
         $jumlahPemesan = Pemesanan::distinct('id')->count();
         $belumBayar = Pemesanan::where('status', 'belum bayar')->distinct('id')->count();
         $lunas = Pemesanan::where('status', 'lunas')->distinct('id')->count();
 
-        return view('admin.dashboard',compact('jumlahPemesan', 'belumBayar','lunas','totalPemasukan', 'data'));
+        return view('admin.dashboard',compact('jumlahPemesan', 'belumBayar','lunas', 'data'));
     }
 
 
@@ -143,8 +148,8 @@ class AdminController extends Controller
 
     public function tambah_roles(Request $request)
     {
-         // Validasi input menggunakan Laravel Validator
-         $validator = Validator::make($request->all(), [
+    
+        $validator = Validator::make($request->all(), [
             'roles' => 'required',
         ]);
 
@@ -165,8 +170,7 @@ class AdminController extends Controller
 
     public function edit_roles(Request $request, $id)
     {
-         // Validasi input menggunakan Laravel Validator
-         $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'roles' => 'required',
             
         ]);
@@ -178,19 +182,17 @@ class AdminController extends Controller
         DB::beginTransaction();
 
         try {
-            // Update data di tabel roles
+        
             Role::where('id', $id)
                 ->update([
                     'roles' => $request->input('roles'),
                 ]);
 
-        
             DB::commit();
 
             return redirect()->back()->with('success', 'Data roles berhasil diperbarui.');
             } catch (\Exception $e) {
                 DB::rollback();
-
                 return redirect()->back()->with('error', 'Gagal memperbarui data roles.')->withInput();
             }
     }
@@ -217,466 +219,398 @@ class AdminController extends Controller
         }
     }
 
-    ######## KOTA ########
-    public function kota()
+
+    ######## RUTE ########
+    public function rute()
     {
-        $data['title'] = 'Kelola Kota';
-
-        $client = new Client();
-
-        $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
-        $data = json_decode($response->getBody(), true);
-
-
-        $kota = $response->getBody();
-        $data['nama_kota'] = json_decode($kota, true);
-        $data['nama_kota'] = $data['nama_kota']['data'];
-        return view('admin.kota', $data);
-    }
-
-    public function tambah_kota(Request $request)
-    {
-        $token = session('access_token');
-
-        $addKota = [
-            'nama_kota' => $request->nama_kota,
-        ];
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token, // token autentikasi
-            'Accept' => 'application/json', // format respon
-        ])->post('http://travel.dlhcode.com/api/tambah_kota', $addKota);
-
-        if ($response->ok()) {
-            $response->json(); // data response jika request sukses
-            // lakukan sesuatu dengan data response
-            return redirect()
-                ->route('kota')
-                ->withSuccess('Kota berhasil ditambahkan');
-        } else {
-            $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
-            $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
-            // lakukan sesuatu dengan pesan error
-            return redirect()->route('kota')
-                ->with('error', 'Kota gagal disimpan');
-        }
-    }
-
-    public function update_kota(Request $request, $id)
-    {
-        $token = session('access_token');
-        $client = new Client([
-            'base_uri' => 'http://travel.dlhcode.com/api/',
-            'timeout' => 50.0,
-        ]);
-
-        $response = $client->request('PUT', "update_kota/$id", [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/x-www-form-urlencoded',
-            ],
-            'json' => [
-                'nama_kota' => $request->nama_kota,
-            ],
-        ]);
-
-        $data = json_decode($response->getBody(), true);
-        return redirect()
-            ->route('kota')
-            ->withSuccess('Kota berhasil diubah');
-    }
-
-    public function form_edit_kota($id)
-    {
-    $data['title'] = 'Edit Kota';
-    $token = session('access_token');
-    $client = new Client([
-    'base_uri' => 'http://travel.dlhcode.com/api/',
-    'timeout' => 2.0,
-    ]);
+        $data['title'] = 'Kelola Jurusan';
+        $getRute = Rute::all();
     
-    $response = $client->request('GET', "get_kota/$id", [
-    'headers' => [
-    'Authorization' => 'Bearer ' . $token,
-    'Accept' => 'application/json',
-    ]
-    ]);
-    
-    
-    $data['kota'] = json_decode($response->getBody(), true);
-    $data['kota'] = $data['kota']['data'][0];
-   
-    return view('admin.editKota', $data);
+        return view('admin.rute', compact('getRute'), $data);
     }
 
-    public function hapus_kota($id)
+    public function tambah_rute(Request $request)
     {
-        $token = session('access_token');
-    $client = new Client([
-    'base_uri' => 'http://travel.dlhcode.com/api/',
-    'timeout' => 2.0,
-    ]);
-
-    $response = $client->request('DELETE', "delete_kota/$id", [
-    'headers' => [
-    'Authorization' => 'Bearer ' . $token,
-    'Accept' => 'application/json',
-    ]
-    ]);
-
-    return redirect()
-            ->route('kota')
-            ->withSuccess('Kota berhasil dihapus');
-    }
-
-    ######## AGEN ########
-    public function agen()
-    {
-        $data['title'] = 'Kelola Agen';
-        $client = new Client();
-
-
-        $response = $client->request('GET', 'http://travel.dlhcode.com/api/kota');
-        $get_kota = json_decode($response->getBody(), true);
-        $agen = $response->getBody();
-        $get_kota['kota'] = json_decode($agen, true);
-        $get_kota['kota'] = $get_kota['kota']['data'];
-
-        $response = $client->request('GET', 'http://travel.dlhcode.com/api/tempat_agen');
-        $data = json_decode($response->getBody(), true);
-        $agen = $response->getBody();
-        $data['tempat_agen'] = json_decode($agen, true);
-        $data['tempat_agen'] = $data['tempat_agen']['data'];
-        return view('admin.agen', $data, $get_kota);
-    }
-
-    public function tambah_agen(Request $request)
-    {
-         // Validasi input menggunakan Laravel Validator
-         $validator = Validator::make($request->all(), [
-            'kota_id' => 'required',
-            'tempat_agen' => 'required',
+        $validator = Validator::make($request->all(), [
+            'keberangkatan' => 'required',
+            'tujuan' => 'required',
+            'waktu' => 'required',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $data = [
-            'kota_id' => $request->kota_id,
-            'tempat_agen' => $request->tempat_agen,
+            'keberangkatan' => $request->keberangkatan,
+            'tujuan' => $request->tujuan,
+            'waktu' => $request->waktu,
             'created_at' => now(),
         ];
-
-        DB::table('tempat_agen')->insert($data);
+        DB::table('rute')->insert($data);
             
         return redirect()
-        ->route('agen.index')
+        ->route('rute')
         ->with('success', 'Data berhasil ditambahkan.');
     }
 
-    public function update_agen(Request $request, $id)
+    public function update_rute(Request $request, $id)
     {
-          // Validasi input menggunakan Laravel Validator
-          $validator = Validator::make($request->all(), [
-            'kota_id' => 'required',
-            'tempat_agen' => 'required',
+        $validator = Validator::make($request->all(), [
+            'keberangkatan' => 'required',
+            'tujuan' => 'required',
+            'waktu' => 'required',
+        ]);
+
+        $user = Rute::find($id);
+        $user->keberangkatan = $request->input('keberangkatan');
+        $user->tujuan = $request->input('tujuan');
+        $user->waktu = $request->input('waktu');
+    
+        $user->save();
+        
+        return redirect()
+            ->route('rute')
+            ->with('success', 'Data berhasil diperbarui.');
+    }
+
+    public function edit_rute($id)
+    {
+        $data['title'] = 'Edit Rute';
+        $rute  = Rute::find($id);
+
+        return view('admin.edit_rute',compact('rute'), $data);
+    }
+
+    public function delete_rute($id)
+    {
+            $route = Rute::findOrFail($id);
+            $route->delete();
+
+            return redirect() 
+            ->route('rute')
+            ->with('success', 'Rute berhasil dihapus.');
+    }
+    ######## ARMADA ########
+    public function armada()
+    {
+        $data['title'] = 'Kelola Armada';
+    
+        $getArmada = DB::table('armada')->get();
+
+        return view('admin.armada',compact('getArmada'), $data);
+    }
+
+    public function tambah_armada(Request $request)
+    {
+        
+        $validator = Validator::make($request->all(), [
+            'nopol' => 'required',
+            'jenis_mobil' => 'required',
+            'kapasitas' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $data = [
+            'nopol' => $request->nopol,
+            'jenis_mobil' => $request->jenis_mobil,
+            'kapasitas' => $request->kapasitas,
+            'created_at' => now(),
+        ];
+
+        DB::table('armada')->insert($data);
+            
+        return redirect()
+        ->route('armada')
+        ->with('success', 'Data berhasil ditambahkan.');
+    }
+
+    public function update_armada(Request $request, $id)
+    {
+        
+        $validator = Validator::make($request->all(), [
+            'nopol' => 'required',
+            'jenis_mobil' => 'required',
+            'kapasitas' => 'required',
             
         ]);
 
-        $user = TempatAgen::find($id);
-        $user->kota_id = $request->input('kota_id');
-        $user->tempat_agen = $request->input('tempat_agen');
-        // Jika ada kolom tambahan yang ingin diubah, tambahkan di sini
+        $user = Shuttle::find($id);
+        $user->nopol = $request->input('nopol');
+        $user->jenis_mobil = $request->input('jenis_mobil');
+        $user->kapasitas = $request->input('kapasitas');
+
 
         $user->save();
         
         return redirect()
-            ->route('agen.index')
+            ->route('armada')
             ->with('success', 'Data berhasil diperbarui.');
     }
 
-    public function edit_agen($id)
+    public function edit_armada($id)
     {
-        $data['title'] = 'Edit Agen';
-        $tempat_agen  = TempatAgen::find($id);
-        $kota = DB::table('kota')->get();
-   
-        return view('admin.edit_agen',compact('tempat_agen','kota'), $data);
+        $data['title'] = 'Edit Armada';
+        $armada  = Shuttle::find($id);
+
+        return view('admin.edit_armada',compact('armada'), $data);
     }
 
-    public function hapus_tempat_agen($id)
+    public function hapus_armada($id)
     {
-        $token = session('access_token');
-    $client = new Client([
-    'base_uri' => 'http://travel.dlhcode.com/api/',
-    'timeout' => 2.0,
-    ]);
+        $armada = Shuttle::findOrFail($id);
+        $armada->delete();
 
-    $response = $client->request('DELETE', "delete_tempat_agen/$id", [
-    'headers' => [
-    'Authorization' => 'Bearer ' . $token,
-    'Accept' => 'application/json',
-    ]
-    ]);
-
-    return redirect()
-            ->route('agen.index')
-            ->withSuccess('Tempat agen berhasil dihapus');
+        return redirect() 
+        ->route('armada')
+        ->with('success', 'Armada berhasil dihapus.');
     }
-   
-    ######## SHUTTLE ########
-    public function shuttle()
+
+    public function fasilitas()
     {
-        $data['title'] = 'Kelola Armada';
-        $token = session('access_token');
-        $client = new Client([
-            'base_uri' => 'http://travel.dlhcode.com/api/',
-            'timeout' => 2.0,
+        $data['title'] = 'Kelola Fasilitas';
+    
+        $getFasilitas = DB::table('fasilitas')->get();
+
+        return view('admin.fasilitas',compact('getFasilitas'), $data);
+    }
+
+    public function tambah_fasilitas(Request $request)
+    {
+    
+        $validator = Validator::make($request->all(), [
+            'nama_fasilitas' => 'required',
         ]);
 
-        $response = $client->request('GET', "shuttle", [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-            ]
-        ]);
-        $data = json_decode($response->getBody(), true);
-        $shuttle = $response->getBody();
-        $data['shuttle'] = json_decode($shuttle, true);
-        $data['shuttle'] = $data['shuttle']['data'];
-        return view('admin.shuttle', $data);
-    }
-
-    public function tambah_shuttle(Request $request)
-    {
-        $token = session('access_token');
-
-        $addShuttle = [
-            'jenis_mobil' => $request->jenis_mobil,
-            'kapasitas' => $request->kapasitas,
-            'fasilitas' => $request->fasilitas,
-        ];
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token, // token autentikasi
-            'Accept' => 'application/json', // format respon
-        ])->post('http://travel.dlhcode.com/api/tambah_shuttle', $addShuttle);
-
-        if ($response->ok()) {
-            $response->json(); // data response jika request sukses
-            // lakukan sesuatu dengan data response
-            return redirect()
-                ->route('shuttle.index')
-                ->withSuccess('Armada berhasil ditambahkan');
-        } else {
-            $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
-            $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
-            // lakukan sesuatu dengan pesan error
-            return redirect()->route('shuttle.index')
-                ->with('error', 'Armada gagal disimpan');
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
-    }
+        $data = [
+            'nama_fasilitas' => $request->nama_fasilitas,
+            'created_at' => now(),
+        ];
 
-    public function update_shuttle(Request $request, $id)
-    {
-        $token = session('access_token');
-        $client = new Client([
-            'base_uri' => 'http://travel.dlhcode.com/api/',
-            'timeout' => 50.0,
-        ]);
-
-        $response = $client->request('PUT', "update_shuttle/$id", [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/x-www-form-urlencoded',
-            ],
-            'json' => [
-                'jenis_mobil' => $request->jenis_mobil,
-                'kapasitas' => $request->kapasitas,
-                'fasilitas' => $request->fasilitas,
-            ],
-        ]);
-
-        $data = json_decode($response->getBody(), true);
+        DB::table('fasilitas')->insert($data);
+            
         return redirect()
-            ->route('shuttle.index')
-            ->withSuccess('shuttle berhasil diubah');
+        ->route('fasilitas')
+        ->with('success', 'Data berhasil ditambahkan.');
     }
 
-    public function edit_shuttle($id)
+    public function update_fasilitas(Request $request, $id)
     {
-        $data['title'] = 'Edit Shuttle';
-        $token = session('access_token');
-        $client = new Client([
-        'base_uri' => 'http://travel.dlhcode.com/api/',
-        'timeout' => 2.0,
-        ]);
     
-        $response = $client->request('GET', "get_shuttle/$id", [
-        'headers' => [
-        'Authorization' => 'Bearer ' . $token,
-        'Accept' => 'application/json',
-        ]
-        ]);
-    
-    
-        $data['shuttle'] = json_decode($response->getBody(), true);
-        $data['shuttle'] = $data['shuttle']['data'][0];
-   
-        return view('admin.edit_shuttle', $data);
-    }
-
-    public function hapus_shuttle($id)
-    {
-        $token = session('access_token');
-        $client = new Client([
-        'base_uri' => 'http://travel.dlhcode.com/api/',
-        'timeout' => 2.0,
+        $validator = Validator::make($request->all(), [
+            'nama_fasilitas' => 'required',
+            
         ]);
 
-        $response = $client->request('DELETE', "delete_shuttle/$id", [
-        'headers' => [
-        'Authorization' => 'Bearer ' . $token,
-        'Accept' => 'application/json',
-        ]
-        ]);
-
+        $user = Fasilitas::find($id);
+        $user->nama_fasilitas = $request->input('nama_fasilitas');
+    
+        $user->save();
+        
         return redirect()
-            ->route('shuttle.index')
-            ->withSuccess('Shuttle berhasil dihapus');
+            ->route('fasilitas')
+            ->with('success', 'Data berhasil diperbarui.');
+    }
+
+    public function edit_fasilitas($id)
+    {
+        $data['title'] = 'Edit Fasilitas';
+        $fasilitas  = Fasilitas::find($id);
+
+        return view('admin.edit_fasilitas',compact('fasilitas'), $data);
+    }
+
+    public function hapus_fasilitas($id)
+    {
+        $fasilitas = Fasilitas::findOrFail($id);
+        $fasilitas->delete();
+
+        return redirect() 
+        ->route('fasilitas')
+        ->with('success', 'Fasilitas berhasil dihapus.');
+    }
+
+    public function detail_fasilitas()
+    {
+        $data['title'] = 'Kelola Detail Fasilitas';
+        
+        $fasilitas = DB::table('fasilitas')->get();
+        $armada = DB::table('armada')->get();
+
+        $getDetail = DB::table('detail_fasilitas')
+            ->join('armada','detail_fasilitas.id_armada','=','armada.id')
+            ->join('fasilitas','detail_fasilitas.id_fasilitas','=','fasilitas.id')
+            ->select('armada.*','fasilitas.nama_fasilitas')
+            ->get();
+
+        return view('admin.detail_fasilitas',compact('getDetail','fasilitas','armada'), $data);
+    }
+
+    public function tambah_detail_fasilitas(Request $request)
+    {
+    
+        $validator = Validator::make($request->all(), [
+            'id_armada' => 'required',
+            'id_fasilitas' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $data = [
+            'id_armada' => $request->id_armada,
+            'id_fasilitas' => $request->id_fasilitas,
+            'created_at' => now(),
+        ];
+
+        DB::table('detail_fasilitas')->insert($data);
+            
+        return redirect()
+            ->route('detail_fasilitas')
+            ->with('success', 'Data berhasil ditambahkan.');
+    }
+
+    public function update_detail_fasilitas(Request $request, $id)
+    {
+    
+        $validator = Validator::make($request->all(), [
+            'id_armada' => 'required',
+            'id_fasilitas' => 'required',
+            
+        ]);
+
+        $user = DetailFasilitas::find($id);
+        $user->id_armada = $request->input('id_armada');
+        $user->id_fasilitas = $request->input('id_fasilitas');
+    
+        $user->save();
+        
+        return redirect()
+            ->route('detail_fasilitas')
+            ->with('success', 'Data berhasil diperbarui.');
+    }
+
+    public function edit_detail_fasilitas($id)
+    {
+        $data['title'] = 'Edit Detail Fasilitas';
+
+        $fasilitas = DB::table('fasilitas')->get();
+        $armada = DB::table('armada')->get();
+        $detfasilitas  = DetailFasilitas::find($id);
+
+        return view('admin.edit_detail_fasilitas',compact('detfasilitas','fasilitas','armada'), $data);
+    }
+
+    public function hapus_detail_fasilitas($id)
+    {
+        $detfasilitas = DetailFasilitas::findOrFail($id);
+        $detfasilitas->delete();
+
+        return redirect() 
+        ->route('detail_fasilitas')
+        ->with('success', 'Detail Fasilitas berhasil dihapus.');
     }
 
 
-    ######## PERSEDIAAN TIKET ########
-    public function persediaan_tiket()
+    ######## JADWAL ########
+    public function jadwal()
     {
         $data['title'] = 'Jadwal Keberangkatan';
-        $token = session('access_token');
-        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/persediaan_tiket');
+        
+        $supir = DB::table('users')->where('users.role_id','=','3')->get();
+        $armada = DB::table('armada')->get();
+        $rute = DB::table('rute')->get();
 
-        $body = $response->getBody();
-        $data['persediaan_tiket'] = json_decode($body, true);
-        $data['persediaan_tiket'] = $data['persediaan_tiket']['data'];
-        $response = Http::get('http://travel.dlhcode.com/api/tempat_agen');
-        $body_tempat_agen = $response->getBody();
-        $data['tempat_agen'] = json_decode($body_tempat_agen, true);
-        $data['tempat_agen'] = $data['tempat_agen']['data'];
+        $getJadwal = DB::table('jadwal_keberangkatan')
+            ->join('armada','jadwal_keberangkatan.id_armada','=','armada.id')
+            ->join('rute','jadwal_keberangkatan.rute','=','rute.id')
+            ->join('users','jadwal_keberangkatan.id_user','=','users.id')
+            ->select('jadwal_keberangkatan.*','armada.nopol','armada.jenis_mobil','armada.kapasitas',
+            'rute.keberangkatan','rute.tujuan','rute.waktu','users.nama')
+            ->get();
 
-        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/shuttle');
-        $body_shuttle = $response->getBody();
-        $data['shuttle'] = json_decode($body_shuttle, true);
-        $data['shuttle'] = $data['shuttle']['data'];
-
-        return view('admin.persediaan_tiket', $data);
+        return view('admin.jadwal', compact('getJadwal','supir','armada','rute'), $data);
     }
-    public function tambah_persediaan_tiket(Request $request)
+    public function tambah_jadwal(Request $request)
     {
-        $token = session('access_token');
+        
+        $validator = Validator::make($request->all(), [
+            'tgl_keberangkatan' => 'required',
+            'id_armada' => 'required',
+            'rute' => 'required',
+            'id_user' => 'required',
+            'estimasi_perjalanan' => 'required',
+            'harga' => 'required',
+        ]);
 
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
         $data = [
             'tgl_keberangkatan' => $request->tgl_keberangkatan,
-            'asal' => $request->asal,
-            'tujuan' => $request->tujuan,
-            'kuota' => $request->kuota,
-            'id_shuttle' => $request->id_shuttle,
+            'id_armada' => $request->id_armada,
+            'rute' => $request->rute,
+            'id_user' => $request->id_user,
             'estimasi_perjalanan' => $request->estimasi_perjalanan,
             'harga' => $request->harga,
+            'created_at' => now(),
         ];
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token, // token autentikasi
-            'Accept' => 'application/json', // format respon
-        ])->post('http://travel.dlhcode.com/api/tambah_persediaan_tiket', $data);
 
-        if ($response->ok()) {
-            $responseData = $response->json(); // data response jika request sukses
-            // lakukan sesuatu dengan data response
-            return redirect()
-                ->route('persediaan_tiket')
-                ->withSuccess('Persediaan tiket berhasil ditambahkan');
-        } else {
-            $errorMessage = $response->serverError() ? 'Server error' : 'Client error'; // pesan error
-            $errorMessage .= ': ' . $response->body(); // tambahkan pesan error dari body response
-            // lakukan sesuatu dengan pesan error
-            return redirect()->route('persediaan_tiket')
-                ->with('error', 'Persediaan tiket gagal disimpan');
-        }
-    }
-    public function update_persediaan_tiket(Request $request, $id)
-    {
-        $token = session('access_token');
-
-        $client = new Client([
-            'base_uri' => 'http://travel.dlhcode.com/api/',
-            'timeout' => 50.0,
-        ]);
-
-        $response = $client->request('PUT', "update_persediaan_tiket/$id", [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/x-www-form-urlencoded',
-            ],
-            'json' => [
-                'tgl_keberangkatan' => $request->tgl_keberangkatan,
-                'asal' => $request->asal,
-                'tujuan' => $request->tujuan,
-                'kuota' => $request->kuota,
-                'id_shuttle' => $request->id_shuttle,
-                'estimasi_perjalanan' => $request->estimasi_perjalanan,
-                'harga' => $request->harga,
-            ],
-        ]);
-
-        $data = json_decode($response->getBody(), true);
+        DB::table('jadwal_keberangkatan')->insert($data);
+            
         return redirect()
-            ->route('persediaan_tiket')
-            ->withSuccess('Persediaan tiket berhasil diubah');
+            ->route('jadwal')
+            ->with('success', 'Data berhasil ditambahkan.');
     }
-    public function form_edit_persediaan($id)
+    public function update_jadwal(Request $request, $id)
     {
-        $data['title'] = 'Edit Persediaan Tiket';
-        $token = session('access_token');
-        $client = new Client([
-            'base_uri' => 'http://travel.dlhcode.com/api/',
-            'timeout' => 2.0,
+        $validator = Validator::make($request->all(), [
+            'tgl_keberangkatan' => 'required',
+            'id_armada' => 'required',
+            'rute' => 'required',
+            'id_user' => 'required',
+            'estimasi_perjalanan' => 'required',
+            'harga' => 'required',
+            
         ]);
 
-        $response = $client->request('GET', "get_persediaan/$id", [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-            ]
-        ]);
-
-        $data['persediaan'] = json_decode($response->getBody(), true);
-        $data['persediaan'] = $data['persediaan']['data'][0];
-        $response = Http::get('http://travel.dlhcode.com/api/tempat_agen');
-        $body_tempat_agen = $response->getBody();
-        $data['tempat_agen'] = json_decode($body_tempat_agen, true);
-        $data['tempat_agen'] = $data['tempat_agen']['data'];
-        $response = Http::withToken("$token")->get('http://travel.dlhcode.com/api/shuttle');
-        $body_shuttle = $response->getBody();
-        $data['shuttle'] = json_decode($body_shuttle, true);
-        $data['shuttle'] = $data['shuttle']['data'];
-
-
-        return view('admin.form_persediaan', $data);
-    }
-    public function delete_persediaan_tiket($id)
-    {
-        $token = session('access_token');
-        $client = new Client([
-            'base_uri' => 'http://travel.dlhcode.com/api/',
-            'timeout' => 2.0,
-        ]);
-
-        $response = $client->request('DELETE', "delete_persediaan_tiket/$id", [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-            ]
-        ]);
-
+        $user = Jadwal::find($id);
+        $user->tgl_keberangkatan = $request->input('tgl_keberangkatan');
+        $user->id_armada = $request->input('id_armada');
+        $user->rute = $request->input('rute');
+        $user->id_user = $request->input('id_user');
+        $user->estimasi_perjalanan = $request->input('estimasi_perjalanan');
+        $user->harga = $request->input('harga');
+    
+        $user->save();
+        
         return redirect()
-            ->route('persediaan_tiket')
-            ->withSuccess('Persediaan tiket berhasil dihapus');
+            ->route('jadwal')
+            ->with('success', 'Data berhasil diperbarui.');
+    }
+    public function edit_jadwal($id)
+    {
+        $data['title'] = 'Edit Jadwal Keberangkatan';
+
+        $supir = DB::table('users')->where('users.role_id','=','3')->get();
+        $armada = DB::table('armada')->get();
+        $rute = DB::table('rute')->get();
+        $jadwal  = Jadwal::find($id);
+
+        return view('admin.edit_jadwal',compact('jadwal','supir','armada','rute'), $data);
+    }
+    public function delete_jadwal($id)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+        $jadwal->delete();
+
+        return redirect() 
+        ->route('jadwal')
+        ->with('success', 'Jadwal berhasil dihapus.');
     }
     public function tracking()
     {
@@ -686,25 +620,28 @@ class AdminController extends Controller
                                     FROM tracking 
                                     LEFT JOIN users 
                                     ON tracking.id_supir = users.id
-                                    LEFT JOIN persediaan_tiket
-                                    ON tracking.id_persediaan_tiket = persediaan_tiket.id
+                                    LEFT JOIN jadwal_keberangkatan
+                                    ON tracking.jadwal_keberangkatan = jadwal_keberangkatan.id
                                     LEFT JOIN kota AS asal_kota
-                                    ON persediaan_tiket.asal = asal_kota.id
+                                    ON jadwal_keberangkatan.asal = asal_kota.id
                                     LEFT JOIN kota AS tujuan_kota
-                                    ON persediaan_tiket.tujuan = tujuan_kota.id
+                                    ON jadwal_keberangkatan.tujuan = tujuan_kota.id
                                     WHERE users.role_id = 3 ORDER BY tracking.id ASC");
         return view('Admin.tracking', compact('tracking'), $data);
     }
 
     public function pemesanan()
     {
+        $data['title'] = 'Pemesanan';
+
         $pemesanan = DB::table('pemesanan')
-            ->join('persediaan_tiket', 'persediaan_tiket.id', '=', 'pemesanan.id_persediaan_tiket')
-            ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
-            ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
-            ->select('pemesanan.*','persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.harga','t.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan')
+            ->join('jadwal_keberangkatan', 'pemesanan.id_jadwal', '=', 'jadwal_keberangkatan.id')
+            ->join('rute', 'jadwal_keberangkatan.rute', '=', 'rute.id')
+            ->join('users', 'pemesanan.id_user', '=', 'users.id')
+            ->join('kursi', 'pemesanan.no_kursi', '=', 'kursi.id')
+            ->select('pemesanan.*','jadwal_keberangkatan.id', 'jadwal_keberangkatan.tgl_keberangkatan', 'jadwal_keberangkatan.harga','rute.keberangkatan', 'rute.tujuan','rute.waktu')
             ->get();
         
-        return view('admin.pemesanan', compact('pemesanan'));
+        return view('admin.pemesanan', compact('pemesanan'), $data);
     }
 }

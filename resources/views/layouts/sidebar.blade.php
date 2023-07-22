@@ -22,11 +22,13 @@
 					</a>
 					<ul class="sub-menu" aria-expanded="false">
 						<li><a href="{{ route('pemesanan') }}" key="t-saas">Pemesanan</a></li>
-						<li><a href="{{ route('persediaan_tiket') }}" key="t-saas">Jadwal Keberangkatan</a></li>
-						<li><a href="{{ route('shuttle.index') }}" key="t-crypto">Armada</a></li>
+						<li><a href="{{ route('jadwal') }}" key="t-saas">Jadwal Keberangkatan</a></li>
+						<li><a href="{{ route('armada') }}" key="t-crypto">Armada</a></li>
+						<li><a href="{{ route('fasilitas') }}" key="t-crypto">Fasilitas</a></li>
+						<li><a href="{{ route('detail_fasilitas') }}" key="t-crypto">Detail Fasilitas</a></li>
 						<li><a href="{{ route('tracking') }}" key="t-crypto">Tracking</a></li>
-						<li><a href="{{ route('agen.index') }}" key="t-blog">Tempat Agen</a></li>
-						<li><a href="{{ route('kota') }}" key="t-blog">Kota</a></li>
+						<li><a href="{{ route('rute') }}" key="t-blog">Rute</a></li>
+						{{-- <li><a href="{{ route('kota') }}" key="t-blog">Kota</a></li> --}}
 					</ul>
 				</li>
 

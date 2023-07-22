@@ -5,20 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Shuttle extends Model
+class Fasilitas extends Model
 {
     use HasFactory;
-    protected $table = 'armada'; //nama tabel pada database
+
+    protected $table = 'fasilitas'; //nama tabel pada database
 
     protected $fillable = [ //kolom yang diizinkan diisi secara massal
         'id',
-        'nopol',
-        'jenis_mobil',
-        'kapasitas',
+        'nama_fasilitas',
     ];
-
-    public function seats()
-    {
-        return $this->hasMany(Kursi::class);
-    }
 }
