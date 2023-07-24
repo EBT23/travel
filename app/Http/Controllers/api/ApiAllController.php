@@ -18,82 +18,6 @@ use Illuminate\Foundation\Auth\User;
 
 class ApiAllController extends Controller
 {
-    // Supir
-    public function supir()
-    {
-        $supir = DB::table('roles')
-            ->join('users', 'roles.id', '=', 'users.role_id')
-            ->select('users.*', 'roles.roles')
-            ->where('roles.id', '=', '3')
-            ->get();
-
-        return response()->json($supir);
-    }
-
-    public function tambah_supir(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required',
-            'no_hp' => 'required',
-            'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:6',
-        ], [
-            'password.min' => 'password minimal 6',
-            'email.unique' => 'email sudah digunakan',
-        ]);
-
-        $users = DB::table('users')->insert([
-            'nama' => $request->nama,
-            'no_hp' => $request->password,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role_id' => 3,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'supir berhasil ditambahkan',
-            'data' => $users
-        ], Response::HTTP_OK);
-    }
-
-    public function update_supir(Request $request, $id)
-
-    {
-        $data = $request->only(
-            'nama',
-            'no_hp',
-            'email',
-            'password',
-            'role_id',
-        );
-
-
-        $supir = DB::table('users')
-            ->where('id', $id)
-            ->update([
-                'nama' => $request->nama,
-                'no_hp' => $request->no_hp,
-                'email' => $request->email,
-                'password' => bcrypt($request->password),
-                'role_id' => $request->role_id,
-            ]);
-        return response()->json([
-            'success' => true,
-            'message' => 'supir berhasil ditambahkan',
-            'data' => $request->all()
-        ], Response::HTTP_OK);
-    }
-
-    public function delete_supir($id)
-    {
-        $supir = User::findOrFail($id);
-        $supir->delete();
-        return response()->json(null, 204);
-    }
-
-
-
     // RUTE
     public function rute()
     {
@@ -103,14 +27,47 @@ class ApiAllController extends Controller
             'data' => $rute,
         ]);
     }
-
-    public function pemesanan()
-    {
-        $pemesanan = Pemesanan::all();
-        return response()->json([
-            'status' => true,
-            'data' => $pemesanan
+    public function jadwal_keberangkatan(Request $request)  {
+        $rute = $request->input('id_rute');
+        $tgl_keberangkatan = date('Y-m-d', strtotime($request->input('tgl_keberangkatan')));
+        $jadwal_keberangkatan = DB::select("SELECT jadwal_keberangkatan.id, jadwal_keberangkatan.tgl_keberangkatan, armada.jenis_mobil, rute.keberangkatan, rute.tujuan, users.nama, jadwal_keberangkatan.estimasi_perjalanan, jadwal_keberangkatan.harga, jadwal_keberangkatan.stok_tiket 
+                                                FROM jadwal_keberangkatan, armada, rute, users 
+                                                WHERE jadwal_keberangkatan.id_armada = armada.id 
+                                                AND jadwal_keberangkatan.id_user = users.id 
+                                                AND jadwal_keberangkatan.rute = rute.id 
+                                                AND jadwal_keberangkatan.rute = $rute 
+                                                AND jadwal_keberangkatan.tgl_keberangkatan LIKE '$tgl_keberangkatan%'");
+         return response()->json([
+            'success' => true,
+            'message' => 'Jadwal Keberangkatan Tersedia',
+            'data' => $jadwal_keberangkatan
         ], Response::HTTP_OK);
+    }
+    public function jadwal_keberangkatan_by_id($id)  {
+        $jadwal_keberangkatan = DB::select("SELECT jadwal_keberangkatan.tgl_keberangkatan, armada.jenis_mobil, rute.keberangkatan, rute.tujuan, users.nama, jadwal_keberangkatan.estimasi_perjalanan, jadwal_keberangkatan.harga, jadwal_keberangkatan.stok_tiket
+                                                FROM jadwal_keberangkatan, armada, rute, users
+                                                WHERE jadwal_keberangkatan.id_armada = armada.id
+                                                AND jadwal_keberangkatan.id_user = users.id
+                                                AND jadwal_keberangkatan.rute = rute.id
+                                                AND jadwal_keberangkatan.id = $id");
+         return response()->json([
+            'success' => true,
+            'message' => 'Jadwal Keberangkatan Tersedia',
+            'data' => $jadwal_keberangkatan
+        ], Response::HTTP_OK);
+    }
+    public function input_pemesanan(Request $request)  {
+        $validated = $request->validate([
+            'id_jadwal' => 'required',
+            // 'nama_pemesan' => 'required',
+            // 'email' => 'required',
+            // 'no_hp' => 'required',
+
+        ]);
+
+        $cekStock = DB::table('jadwal_keberangkatan')->where('id', $request->id_jadwal)->first();
+        dd($cekStock);
+
     }
     public function tambah_pemesanan(Request $request)
     {
@@ -125,7 +82,7 @@ class ApiAllController extends Controller
         if ($cekStock->kuota == 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tiket Josong',
+                'message' => 'Tiket Kosong',
             ], Response::HTTP_OK);
         } else {
 
@@ -203,38 +160,6 @@ class ApiAllController extends Controller
             'data' => $shuttle
         ]);
     }
-    public function get_role($id)
-    {
-        $role = DB::table('roles')->where('roles.id', '=', $id)
-            ->select('roles.id', 'roles.roles')
-            ->get();
-        return response()->json([
-            'success' => true,
-            'data' => $role
-        ]);
-    }
-    public function get_kota($id)
-    {
-        $kota = DB::table('kota')->where('kota.id', '=', $id)
-            ->select('kota.id', 'kota.nama_kota')
-            ->get();
-        return response()->json([
-            'success' => true,
-            'data' => $kota
-        ]);
-    }
-    public function get_tempat_agen($id)
-    {
-        $kota = DB::table('tempat_agen')
-            ->join('kota', 'kota.id', '=', 'tempat_agen.kota_id' )
-            ->where('tempat_agen.id', '=', $id)
-            ->select('tempat_agen.kota_id', 'kota.nama_kota', 'tempat_agen.tempat_agen')
-            ->get();
-        return response()->json([
-            'success' => true,
-            'data' => $kota
-        ]);
-    }
     public function riwayat_tiket(Request $request)
     {
         $email = $request->input('email');
@@ -294,28 +219,7 @@ class ApiAllController extends Controller
     }
       public function cetak_tiket(Request $request)
     {
-        $order_id = $request->input('order_id');
-
-        $cetakTiket = DB::select("select p.*,ta.tempat_agen as asal, tt.tempat_agen as tujuan from pemesanan p 
-left join persediaan_tiket pt on p.id_persediaan_tiket=pt.id 
-left join tempat_agen ta on pt.asal=ta.id
-left join tempat_agen tt on pt.tujuan=tt.id
-where p.order_id = '$order_id'");
-        if ($cetakTiket != false) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Data tersedia',
-                'data' => [$cetakTiket[0]],
-                'data1' => $cetakTiket[0]
-            ], Response::HTTP_OK);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak tersedia',
-                'data' => [$cetakTiket[0]],
-                'data1' => $cetakTiket[0]
-            ], Response::HTTP_OK);
-        }
+//         
     }
     public function updateTransaksi(Request $request)
     {
@@ -447,62 +351,62 @@ where p.order_id = '$order_id'");
 
     public function getKapasitasKursiByJenisMobil($mobil)
     {
-        // Mengambil kapasitas kursi tersedia untuk jenis mobil tertentu
-        $kapasitasTersedia = Shuttle::where('jenis_mobil', $mobil)
-                                    ->pluck('kapasitas')
-                                    ->first();
+        // // Mengambil kapasitas kursi tersedia untuk jenis mobil tertentu
+        // $kapasitasTersedia = Shuttle::where('jenis_mobil', $mobil)
+        //                             ->pluck('kapasitas')
+        //                             ->first();
 
-        // Membuat array kosong untuk menyimpan nomor kursi
-        $nomorKursi = [];
+        // // Membuat array kosong untuk menyimpan nomor kursi
+        // $nomorKursi = [];
 
-        // Menambahkan nomor kursi sesuai dengan kapasitas yang tersedia
-        for ($i = 1; $i <= $kapasitasTersedia; $i++) {
-            $nomorKursi[] = $i;
-        }
+        // // Menambahkan nomor kursi sesuai dengan kapasitas yang tersedia
+        // for ($i = 1; $i <= $kapasitasTersedia; $i++) {
+        //     $nomorKursi[] = $i;
+        // }
 
-        return response()->json(['nomor_kursi_tersedia' => $nomorKursi]);
+        // return response()->json(['nomor_kursi_tersedia' => $nomorKursi]);
     }
         
      public function pilihSeat(Request $request)
     {
-        $nomer_seat = $request->input('no_kursi');
-        $jenis_mobil = $request->input('jenis_mobil');
+        // $nomer_seat = $request->input('no_kursi');
+        // $jenis_mobil = $request->input('jenis_mobil');
     
-        // Cek apakah kursi sudah dipesan sebelumnya untuk jenis mobil tertentu
-        $getSeat = Kursi::where('no_kursi', $nomer_seat)->where('jenis_mobil', $jenis_mobil)->first();
-        if ($getSeat) {
-            return response()->json(['message' => 'Kursi sudah dipesan'], 400);
-        }
+        // // Cek apakah kursi sudah dipesan sebelumnya untuk jenis mobil tertentu
+        // $getSeat = Kursi::where('no_kursi', $nomer_seat)->where('jenis_mobil', $jenis_mobil)->first();
+        // if ($getSeat) {
+        //     return response()->json(['message' => 'Kursi sudah dipesan'], 400);
+        // }
     
-        // Cek apakah semua kursi sudah dipesan untuk jenis mobil tertentu
-        $kapasitas = Shuttle::where('jenis_mobil', $jenis_mobil)->value('kapasitas');
-        if (!$kapasitas) {
-            return response()->json(['message' => 'Jenis mobil tidak ditemukan'], 404);
-        }
+        // // Cek apakah semua kursi sudah dipesan untuk jenis mobil tertentu
+        // $kapasitas = Shuttle::where('jenis_mobil', $jenis_mobil)->value('kapasitas');
+        // if (!$kapasitas) {
+        //     return response()->json(['message' => 'Jenis mobil tidak ditemukan'], 404);
+        // }
     
-        $bookedSeatsCount = Kursi::where('no_kursi', $nomer_seat)->count();
-        if ($bookedSeatsCount >= $kapasitas) {
-            return response()->json(['message' => 'Tidak ada kursi yang tersedia untuk nomor kursi ini'], 400);
-        }
+        // $bookedSeatsCount = Kursi::where('no_kursi', $nomer_seat)->count();
+        // if ($bookedSeatsCount >= $kapasitas) {
+        //     return response()->json(['message' => 'Tidak ada kursi yang tersedia untuk nomor kursi ini'], 400);
+        // }
 
-        try {
-            DB::beginTransaction();
+        // try {
+        //     DB::beginTransaction();
 
-            // Tambahkan kursi baru
-            $seat = new Kursi();
-            $seat->no_kursi = $nomer_seat;
-            $seat->jenis_mobil = $jenis_mobil;
-            $seat->save();
+        //     // Tambahkan kursi baru
+        //     $seat = new Kursi();
+        //     $seat->no_kursi = $nomer_seat;
+        //     $seat->jenis_mobil = $jenis_mobil;
+        //     $seat->save();
 
-            Shuttle::where('jenis_mobil', $jenis_mobil)->decrement('kapasitas');
+        //     Shuttle::where('jenis_mobil', $jenis_mobil)->decrement('kapasitas');
 
-            DB::commit();
+        //     DB::commit();
 
-            return response()->json(['message' => 'Kursi berhasil dipilih'], 200);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Terjadi kesalahan dalam memilih kursi'], 500);
-        }
+        //     return response()->json(['message' => 'Kursi berhasil dipilih'], 200);
+        // } catch (Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(['message' => 'Terjadi kesalahan dalam memilih kursi'], 500);
+        // }
 
     }
 
