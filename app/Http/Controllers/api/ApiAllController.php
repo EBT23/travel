@@ -56,19 +56,6 @@ class ApiAllController extends Controller
             'data' => $jadwal_keberangkatan
         ], Response::HTTP_OK);
     }
-    public function input_pemesanan(Request $request)  {
-        $validated = $request->validate([
-            'id_jadwal' => 'required',
-            // 'nama_pemesan' => 'required',
-            // 'email' => 'required',
-            // 'no_hp' => 'required',
-
-        ]);
-
-        $cekStock = DB::table('jadwal_keberangkatan')->where('id', $request->id_jadwal)->first();
-        dd($cekStock);
-
-    }
     public function tambah_pemesanan(Request $request)
     {
         $validated = $request->validate([
@@ -78,32 +65,46 @@ class ApiAllController extends Controller
             'no_hp' => 'required',
 
         ]);
-        $cekStock = DB::table('persediaan_tiket')->where('id', $request->id_persediaan_tiket)->first();
-        if ($cekStock->kuota == 0) {
+        $cekStock = DB::table('jadwal_keberangkatan')->where('id', $request->id_jadwal)->first();
+        if ($cekStock->stok_tiket == 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tiket Kosong',
             ], Response::HTTP_OK);
         } else {
+          
+                $no_kursi = DB::table('pemesanan')->where('id_jadwal', $request->id_jadwal)->orderBy('no_kursi','desc')
+                ->latest()->first();
+                if ($no_kursi != null) {
+                    $no_kursi = $no_kursi->no_kursi;
+                }
+                if ($no_kursi == null) {
+                    $no_kursi = 0;
+                }             
+                if ($no_kursi == 0) {
+                    $no_kursi = 1;
+                }else {
+                    (int)$no_kursi += 1;
+                }
 
 
             $pemesanan = DB::table('pemesanan')->insert([
-                'id_persediaan_tiket' => $request->id_persediaan_tiket,
+                'id_jadwal' => $request->id_jadwal,
                 'id_user' => $request->id_user,
                 'nama_pemesan' => $request->nama_pemesan,
                 'email' => $request->email,
                 'no_hp' => $request->no_hp,
                 'status' => $request->status,
                 'order_id' => $request->order_id,
-                'redirect_url' => $request->redirect_url
+                'redirect_url' => $request->redirect_url,
+                'no_kursi' => $no_kursi,
             ]);
 
-
             $datapersediaan = [
-                'kuota' => $cekStock->kuota - 1
+                'stok_tiket' => $cekStock->stok_tiket - 1
             ];
 
-            $updateStock = DB::table('persediaan_tiket')->where('id', $request->id_persediaan_tiket)->update($datapersediaan);
+           DB::table('jadwal_keberangkatan')->where('id', $request->id_jadwal)->update($datapersediaan);
 
             return response()->json([
                 'success' => true,
@@ -111,54 +112,6 @@ class ApiAllController extends Controller
                 'data' => $pemesanan
             ], Response::HTTP_OK);
         }
-    }
-    public function cek_persediaan(Request $request)
-    {
-        $asal = $request->input('asal');
-        $tujuan = $request->input('tujuan');
-        $tgl_keberangkatan = date('Y-m-d', strtotime($request->input('tgl_keberangkatan')));
-
-        $persediaan_tiket = DB::table('persediaan_tiket')
-            ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
-            ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
-            ->join('shuttle','shuttle.id','=','persediaan_tiket.id_shuttle')
-            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.kuota', 'persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan','shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
-            ->where('asal', $asal)
-            ->where('tujuan', $tujuan)
-            ->where('tgl_keberangkatan', 'like', '%' . $tgl_keberangkatan . '%')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data tersedia',
-            'data' => $persediaan_tiket
-        ], Response::HTTP_OK);
-    }
-    public function get_persediaan($id)
-    {
-         $persediaan_tiket = DB::table('persediaan_tiket')
-            ->join('tempat_agen AS t', 't.id', '=', 'persediaan_tiket.asal')
-            ->join('tempat_agen', 'tempat_agen.id', '=', 'persediaan_tiket.tujuan')
-            ->join('shuttle','shuttle.id','=','persediaan_tiket.id_shuttle')
-            ->where('persediaan_tiket.id', '=', $id)
-            ->select('persediaan_tiket.id', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.tgl_keberangkatan', 'persediaan_tiket.kuota', 'persediaan_tiket.id_shuttle','persediaan_tiket.estimasi_perjalanan', 'persediaan_tiket.harga', 't.tempat_agen AS asal', 'tempat_agen.tempat_agen AS tujuan', 'shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
-            ->get();
-        return response()->json([
-            'success' => true,
-            'message' => 'Data berhasil ditampilkan',
-            'data' => $persediaan_tiket
-        ]);
-    }
-    public function get_shuttle($id)
-    {
-         $shuttle = DB::table('shuttle')->where('shuttle.id','=', $id)
-            ->select('shuttle.id','shuttle.jenis_mobil','shuttle.kapasitas','shuttle.fasilitas')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $shuttle
-        ]);
     }
     public function riwayat_tiket(Request $request)
     {
@@ -325,90 +278,5 @@ class ApiAllController extends Controller
                         'data' => $tracking
                     ], Response::HTTP_OK);
                 }
-    }
-
-    public function tampilkanSeat()
-    {
-
-         // Mengambil semua jenis mobil
-        $jenis_mobil = Shuttle::pluck('jenis_mobil')->all();
-
-        // Membuat array kosong untuk menyimpan kapasitas kursi berdasarkan jenis mobil
-        $kapasitasByJenisMobil = [];
-
-        // Loop melalui setiap jenis mobil
-        foreach ($jenis_mobil as $jenis) {
-            // Mengambil kapasitas kursi untuk jenis mobil tertentu
-            $kapasitas = Shuttle::where('jenis_mobil', $jenis)->value('kapasitas');
-
-            // Menyimpan kapasitas kursi dalam array berdasarkan jenis mobil
-            $kapasitasByJenisMobil[$jenis] = $kapasitas;
-        }
-
-        return response()->json(['kapasitas_by_jenis_mobil' => $kapasitasByJenisMobil]);
-
-    }
-
-    public function getKapasitasKursiByJenisMobil($mobil)
-    {
-        // // Mengambil kapasitas kursi tersedia untuk jenis mobil tertentu
-        // $kapasitasTersedia = Shuttle::where('jenis_mobil', $mobil)
-        //                             ->pluck('kapasitas')
-        //                             ->first();
-
-        // // Membuat array kosong untuk menyimpan nomor kursi
-        // $nomorKursi = [];
-
-        // // Menambahkan nomor kursi sesuai dengan kapasitas yang tersedia
-        // for ($i = 1; $i <= $kapasitasTersedia; $i++) {
-        //     $nomorKursi[] = $i;
-        // }
-
-        // return response()->json(['nomor_kursi_tersedia' => $nomorKursi]);
-    }
-        
-     public function pilihSeat(Request $request)
-    {
-        // $nomer_seat = $request->input('no_kursi');
-        // $jenis_mobil = $request->input('jenis_mobil');
-    
-        // // Cek apakah kursi sudah dipesan sebelumnya untuk jenis mobil tertentu
-        // $getSeat = Kursi::where('no_kursi', $nomer_seat)->where('jenis_mobil', $jenis_mobil)->first();
-        // if ($getSeat) {
-        //     return response()->json(['message' => 'Kursi sudah dipesan'], 400);
-        // }
-    
-        // // Cek apakah semua kursi sudah dipesan untuk jenis mobil tertentu
-        // $kapasitas = Shuttle::where('jenis_mobil', $jenis_mobil)->value('kapasitas');
-        // if (!$kapasitas) {
-        //     return response()->json(['message' => 'Jenis mobil tidak ditemukan'], 404);
-        // }
-    
-        // $bookedSeatsCount = Kursi::where('no_kursi', $nomer_seat)->count();
-        // if ($bookedSeatsCount >= $kapasitas) {
-        //     return response()->json(['message' => 'Tidak ada kursi yang tersedia untuk nomor kursi ini'], 400);
-        // }
-
-        // try {
-        //     DB::beginTransaction();
-
-        //     // Tambahkan kursi baru
-        //     $seat = new Kursi();
-        //     $seat->no_kursi = $nomer_seat;
-        //     $seat->jenis_mobil = $jenis_mobil;
-        //     $seat->save();
-
-        //     Shuttle::where('jenis_mobil', $jenis_mobil)->decrement('kapasitas');
-
-        //     DB::commit();
-
-        //     return response()->json(['message' => 'Kursi berhasil dipilih'], 200);
-        // } catch (Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json(['message' => 'Terjadi kesalahan dalam memilih kursi'], 500);
-        // }
-
-    }
-
-
+    }  
 }

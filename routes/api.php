@@ -28,10 +28,6 @@ Route::get('/tempat_agen', [ApiAllController::class, 'tempat_agen']);
 //cek persediaan tiket
 Route::post('/cek_persediaan_tiket', [ApiAllController::class, 'cek_persediaan']);
 
-//PEMESANAN
-Route::get('/pemesanan', [ApiAllController::class, 'pemesanan']);
-Route::post('/tambah_pemesanan', [ApiAllController::class, 'tambah_pemesanan']);
-Route::delete('/delete_pemesanan', [ApiAllController::class, 'delete_pemesanan']);
 
 Route::post('/riwayat_tiket', [ApiAllController::class, 'riwayat_tiket']);
 
@@ -59,7 +55,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/jadwal_keberangkatan_by_id/{id}', [ApiAllController::class, 'jadwal_keberangkatan_by_id']);
 
     //PEMESANAN
-    Route::post('/input_pemesanan', [ApiAllController::class, 'input_pemesanan']);
+    //PEMESANAN
+    Route::get('/pemesanan', [ApiAllController::class, 'pemesanan']);
+    Route::post('/tambah_pemesanan', [ApiAllController::class, 'tambah_pemesanan']);
+    Route::delete('/delete_pemesanan', [ApiAllController::class, 'delete_pemesanan']);
 
     //SUPIR
     Route::get('/supir', [ApiAllController::class, 'supir']);
