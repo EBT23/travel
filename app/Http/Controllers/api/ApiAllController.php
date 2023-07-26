@@ -127,10 +127,9 @@ class ApiAllController extends Controller
         // }
 
 
-        $riwayat_tiket = DB::select("SELECT p.*, pt.tgl_keberangkatan, pt.kuota, pt.estimasi_perjalanan, pt.harga, ta.tempat_agen as asal, tt.tempat_agen as tujuan FROM pemesanan p 
-        LEFT JOIN persediaan_tiket pt on p.id_persediaan_tiket=pt.id
-        LEFT JOIN tempat_agen ta on pt.asal=ta.id
-        LEFT JOIN tempat_agen tt on pt.tujuan=tt.id
+        $riwayat_tiket = DB::select("SELECT p.*, pt.tgl_keberangkatan, pt.stok_tiket, pt.estimasi_perjalanan, pt.harga, rt.keberangkatan, rt.tujuan FROM pemesanan p 
+        LEFT JOIN jadwal_keberangkatan pt on p.id_jadwal=pt.id
+        LEFT JOIN rute rt on pt.rute=rt.id
         WHERE 1=1 $andemail  $and");
 
 
@@ -193,7 +192,7 @@ class ApiAllController extends Controller
     }
     public function tracking()
     {
-        $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.longitude, tracking.latitude, tracking.nama_lokasi, tracking.tgl, tracking.jam 
+        $tracking = DB::select("SELECT users.nama, rute., tracking.longitude, tracking.latitude, tracking.nama_lokasi, tracking.tgl, tracking.jam 
                                     FROM tracking 
                                     LEFT JOIN users 
                                     ON tracking.id_supir = users.id
@@ -219,7 +218,6 @@ class ApiAllController extends Controller
                     ], Response::HTTP_OK);
                 }
     }
-    
    
     public function tambah_tracking(Request $request)
     {
@@ -235,7 +233,7 @@ class ApiAllController extends Controller
         // simpan data ke database
         $tracking = DB::table('tracking')->insert([
             'id_supir' => $request->id_supir,
-            'id_persediaan_tiket' => $request->id_persediaan_tiket,
+            'id_jawal' => $request->id_jadwal,
             'lat_long' => $request->lat_long,
             'nama_lokasi' => $request->nama_lokasi,
             'tgl' => $request->tgl,
@@ -252,16 +250,14 @@ class ApiAllController extends Controller
     public function tracking_by_id_supir(Request $request)
     {
         
-        $tracking = DB::select("SELECT users.nama, asal_kota.nama_kota, tujuan_kota.nama_kota as tujuan, tracking.lat_long, tracking.nama_lokasi, tracking.tgl, tracking.jam 
+        $tracking = DB::select("SELECT users.nama, rute.keberangkatan, rute.tujuan as tujuan, tracking.lat_long, tracking.nama_lokasi, tracking.tgl, tracking.jam 
                                     FROM tracking 
                                     LEFT JOIN users 
                                     ON tracking.id_supir = users.id
-                                    LEFT JOIN persediaan_tiket
-                                    ON tracking.id_persediaan_tiket = persediaan_tiket.id
-                                    LEFT JOIN kota AS asal_kota
-                                    ON persediaan_tiket.asal = asal_kota.id
-                                    LEFT JOIN kota AS tujuan_kota
-                                    ON persediaan_tiket.tujuan = tujuan_kota.id
+                                    LEFT JOIN jadwal_keberangkatan
+                                    ON tracking.id_jadwal = jadwal_keberangkatan.id
+                                    LEFT JOIN rute 
+                                    ON rute.id = jadwal_keberangkatan.rute
                                     WHERE users.role_id = 3
                                     AND users.id = '$request->id'");
 

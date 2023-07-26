@@ -37,10 +37,9 @@ Route::post('/cetak_tiket', [ApiAllController::class, 'cetak_tiket']);
 Route::post('/updateTransaksi', [ApiAllController::class, 'updateTransaksi']);
 
  //Tracking
-    Route::get('/tracking', [ApiAllController::class, 'tracking']);
-    Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
-    Route::get('/persediaan_tiket', [ApiAllController::class, 'persediaan_tiket']);
-    Route::post('/tracking_by_id_supir', [ApiAllController::class, 'tracking_by_id_supir']);
+Route::get('/tracking', [ApiAllController::class, 'tracking']);
+Route::post('/tambah_tracking', [ApiAllController::class, 'tambah_tracking']);
+Route::post('/tracking_by_id_supir', [ApiAllController::class, 'tracking_by_id_supir']);
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
